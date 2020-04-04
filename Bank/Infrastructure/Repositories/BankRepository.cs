@@ -15,7 +15,8 @@ namespace Bank.Infrastructure.Repositories
         }
 
         public async Task<BankEntity> GetInfoAsync()
-            => await _bankContext.Banks.Include(x => x.Accounts)
+            => await _bankContext.Banks
+                .Include(x => x.Accounts)
                 .SingleOrDefaultAsync();
     }
 }

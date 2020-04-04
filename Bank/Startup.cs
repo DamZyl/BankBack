@@ -36,6 +36,7 @@ namespace Bank
             services.AddScoped<IBankRepository, BankRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IBankService, BankService>();
+            services.AddScoped<ICustomerService, CustomerService>();
             
             services.AddControllers();
         }

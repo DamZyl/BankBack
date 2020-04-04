@@ -18,6 +18,6 @@ namespace Bank.Controllers
 
         [HttpGet]
         public async Task<ActionResult<BankDetailsDto>> GetAsync()
-            => await _bankService.GetInfoAsync();
+            => new JsonResult(await _bankService.GetInfoAsync());
     }
 }
