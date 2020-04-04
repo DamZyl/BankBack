@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bank.Infrastructure.Mappers;
 using Bank.Infrastructure.Repositories;
+using Bank.Models;
 using Bank.Models.Commands;
 using Bank.Models.Dtos;
 
@@ -13,11 +14,14 @@ namespace Bank.Services
     {
         private readonly IAccountRepository _accountRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IBankRepository _bankRepository;
 
-        public AccountService(IAccountRepository accountRepository , ICustomerRepository customerRepository)
+        public AccountService(IAccountRepository accountRepository , ICustomerRepository customerRepository,
+            IBankRepository bankRepository)
         {
             _accountRepository = accountRepository;
             _customerRepository = customerRepository;
+            _bankRepository = bankRepository;
         }
         
         public async Task<IEnumerable<AccountDetailsDto>> GetCustomerAccountsAsync(Guid customerId)
@@ -48,12 +52,30 @@ namespace Bank.Services
 
         public async Task CreateAccountAsync(CreateAccount command)
         {
-            await Task.CompletedTask;
-        }
+            var bank = await _bankRepository.GetInfoAsync();
 
-        public async Task UpdateAccountAsync(Guid id, UpdateAccount command)
-        {
-            await Task.CompletedTask;
+            if (bank == null)
+            {
+                throw new Exception("Bank doesn't exist.");
+            }
+
+            var customer = await _customerRepository.GetCustomerByIdAsync(command.CustomerId);
+
+            if (customer == null)
+            {
+                throw new Exception("Customer doesn't exist.");
+            }
+
+            var account = new Account
+            {
+                Id = command.Id,
+                BankId = command.BankId,
+                CustomerId = command.CustomerId,
+                AccountNumber = command.AccountNumber,
+                Balance = command.Balance
+            };
+
+            await _accountRepository.AddAccountAsync(account);
         }
 
         public async Task DeleteAccountAsync(Guid id)

@@ -35,14 +35,6 @@ namespace Bank.Controllers
             return CreatedAtAction(null, null, null);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateCustomer(Guid id, [FromBody] UpdateAccount command)
-        {
-            await _accountService.UpdateAccountAsync(id, command);
-
-            return NoContent();
-        }
-
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCustomer(Guid id)
         {

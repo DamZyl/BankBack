@@ -11,7 +11,7 @@ namespace Bank.Infrastructure.Database
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         
-        public BankContext(DbContextOptions<BankContext> options) : base(options) {  }
+        public BankContext(DbContextOptions options) : base(options) {  }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
