@@ -37,6 +37,19 @@ namespace Bank.Infrastructure.Mappers
             };
         }
 
+        public static AccountDetailsDto MapAccountToAccountDetailsDto(Account account)
+        {
+            return new AccountDetailsDto
+            {
+                Id = account.Id,
+                CustomerId = account.CustomerId,
+                AccountNumber = account.AccountNumber,
+                Balance = account.Balance,
+                TransactionCount = account.Transactions.Count,
+                Transactions = account.Transactions.Select(MapTransactionToTransactionDto)
+            };
+        }
+
         private static AccountDto MapAccountToAccountDto(Account account)
         {
             return new AccountDto
@@ -44,7 +57,19 @@ namespace Bank.Infrastructure.Mappers
                 Id = account.Id,
                 CustomerId = account.CustomerId,
                 AccountNumber = account.AccountNumber,
-                Balance = account.Balance
+                Balance = account.Balance,
+            };
+        }
+
+        private static TransactionDto MapTransactionToTransactionDto(Transaction transaction)
+        {
+            return new TransactionDto
+            {
+                Id = transaction.Id,
+                AccountId = transaction.AccountId,
+                Date = transaction.Date,
+                TransactionType = transaction.TransactionType.ToString(),
+                Value = transaction.Value
             };
         }
     }

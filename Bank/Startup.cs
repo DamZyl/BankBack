@@ -35,8 +35,12 @@ namespace Bank
             
             services.AddScoped<IBankRepository, BankRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IBankService, BankService>();
             services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<ITransactionService, TransactionService>();
             
             services.AddControllers();
         }

@@ -33,7 +33,7 @@ namespace Bank.Controllers
             => new JsonResult(await _customerService.GetCustomerByMailAsync(email));
 
         [HttpPost]
-        public async Task<ActionResult<CustomerDetailsDto>> CreateCustomer([FromBody] CreateCustomer command)
+        public async Task<ActionResult> CreateCustomer([FromBody] CreateCustomer command)
         {
             await _customerService.CreateCustomerAsync(command);
 
@@ -41,7 +41,7 @@ namespace Bank.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<CustomerDetailsDto>> UpdateCustomer(Guid id, [FromBody] UpdateCustomer command)
+        public async Task<ActionResult> UpdateCustomer(Guid id, [FromBody] UpdateCustomer command)
         {
             await _customerService.UpdateCustomerAsync(id, command);
 
@@ -49,7 +49,7 @@ namespace Bank.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<CustomerDetailsDto>> DeleteCustomer(Guid id)
+        public async Task<ActionResult> DeleteCustomer(Guid id)
         {
             await _customerService.DeleteCustomerAsync(id);
 
