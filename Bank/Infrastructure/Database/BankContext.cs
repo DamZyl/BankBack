@@ -89,6 +89,10 @@ namespace Bank.Infrastructure.Database
                 .HasOne(x => x.Account)
                 .WithMany(x => x.Transactions)
                 .HasForeignKey(x => x.AccountId);
+            
+            modelBuilder.Entity<Transaction>()
+                .Property(x => x.TransactionType)
+                .HasConversion<string>();
 
             #endregion
         }

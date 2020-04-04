@@ -95,8 +95,9 @@ namespace Bank.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TransactionType")
-                        .HasColumnType("int");
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(18,2)");
@@ -107,7 +108,7 @@ namespace Bank.Migrations
 
                     b.ToTable("Transactions");
 
-                    b.HasCheckConstraint("CK_Transactions_TransactionType_Enum_Constraint", "[TransactionType] IN(0, 1)");
+                    b.HasCheckConstraint("CK_Transactions_TransactionType_Enum_Constraint", "[TransactionType] IN(N'Income', N'Outcome')");
                 });
 
             modelBuilder.Entity("Bank.Models.Account", b =>
