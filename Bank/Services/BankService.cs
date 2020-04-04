@@ -1,8 +1,7 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
+using Bank.Infrastructure.Mappers;
 using Bank.Infrastructure.Repositories;
-using Bank.Models;
 using Bank.Models.Dtos;
 
 namespace Bank.Services
@@ -25,27 +24,7 @@ namespace Bank.Services
                 throw new Exception("Bank doesn't exist.");
             }
 
-            return new BankDetailsDto
-            {
-                Id = bank.Id,
-                Name = bank.Name,
-                Address = $"{ bank.Address.Street } { bank.Address.Number }",
-                City = $"{ bank.Address.PostCode } { bank.Address.City }",
-                Country = $"{ bank.Address.Country }",
-                AccountCount = bank.Accounts.Count,
-                Accounts = bank.Accounts.Select(MapAccountToAccountDto)
-            };
-        }
-
-        private static AccountDto MapAccountToAccountDto(Account account)
-        {
-            return new AccountDto
-            {
-                Id = account.Id,
-                CustomerId = account.CustomerId,
-                AccountNumber = account.AccountNumber,
-                Balance = account.Balance
-            };
+            return Mapper.MapBankToBankDetailsDto(bank);
         }
     }
 }

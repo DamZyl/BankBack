@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bank.Migrations
 {
     [DbContext(typeof(BankContext))]
-    [Migration("20200404162047_Init")]
+    [Migration("20200404193317_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,8 +97,9 @@ namespace Bank.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TransactionType")
-                        .HasColumnType("int");
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(18,2)");
@@ -109,7 +110,7 @@ namespace Bank.Migrations
 
                     b.ToTable("Transactions");
 
-                    b.HasCheckConstraint("CK_Transactions_TransactionType_Enum_Constraint", "[TransactionType] IN(0, 1)");
+                    b.HasCheckConstraint("CK_Transactions_TransactionType_Enum_Constraint", "[TransactionType] IN(N'Income', N'Outcome')");
                 });
 
             modelBuilder.Entity("Bank.Models.Account", b =>
@@ -125,6 +126,78 @@ namespace Bank.Migrations
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Bank.Models.Bank", b =>
+                {
+                    b.OwnsOne("Bank.Models.Address", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("BankId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("City")
+                                .HasColumnName("City")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Country")
+                                .HasColumnName("Country")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Number")
+                                .HasColumnName("Number")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("PostCode")
+                                .HasColumnName("PostCode")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Street")
+                                .HasColumnName("Street")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("BankId");
+
+                            b1.ToTable("Banks");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BankId");
+                        });
+                });
+
+            modelBuilder.Entity("Bank.Models.Customer", b =>
+                {
+                    b.OwnsOne("Bank.Models.Address", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("CustomerId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("City")
+                                .HasColumnName("City")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Country")
+                                .HasColumnName("Country")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Number")
+                                .HasColumnName("Number")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("PostCode")
+                                .HasColumnName("PostCode")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Street")
+                                .HasColumnName("Street")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("CustomerId");
+
+                            b1.ToTable("Customers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CustomerId");
+                        });
                 });
 
             modelBuilder.Entity("Bank.Models.Transaction", b =>

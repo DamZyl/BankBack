@@ -1,34 +1,52 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Bank.Infrastructure.Database;
 using Bank.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Infrastructure.Repositories
 {
     public class CustomerRepository : ICustomerRepository
     {
-        public Task<IEnumerable<Customer>> GetCustomersAsync()
+        private readonly BankContext _bankContext;
+
+        public CustomerRepository(BankContext bankContext)
         {
-            throw new System.NotImplementedException();
+            _bankContext = bankContext;
         }
 
-        public Task<Customer> GetCustomerAsync(string email)
+        public async Task<IEnumerable<Customer>> GetCustomersAsync()
+            => await _bankContext.Customers
+                .Include(x => x.Accounts)
+                .ToListAsync();
+
+        public async Task<Customer> GetCustomerByIdAsync(Guid id)
+            => await _bankContext.Customers
+                .Include(x => x.Accounts)
+                .SingleOrDefaultAsync(x => x.Id == id);
+
+        public async Task<Customer> GetCustomerByMailAsync(string email)
+            => await _bankContext.Customers
+                .Include(x => x.Accounts)
+                .SingleOrDefaultAsync(x => x.Email == email);
+
+        public async Task AddCustomerAsync(Customer customer)
         {
-            throw new System.NotImplementedException();
+            await _bankContext.Customers.AddAsync(customer);
+            await _bankContext.SaveChangesAsync();
         }
 
-        public Task AddCustomerAsync(Customer customer)
+        public async Task UpdateCustomerAsync(Customer customer)
         {
-            throw new System.NotImplementedException();
+            _bankContext.Customers.Update(customer);
+            await _bankContext.SaveChangesAsync();
         }
 
-        public Task EditCustomerAsync(Customer customer)
+        public async Task DeleteCustomerAsync(Customer customer)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public Task DeleteCustomerAsync(Customer customer)
-        {
-            throw new System.NotImplementedException();
+            _bankContext.Customers.Remove(customer);
+            await _bankContext.SaveChangesAsync();
         }
     }
 }

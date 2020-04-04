@@ -12,7 +12,12 @@ namespace Bank.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(nullable: true),
+                    Street = table.Column<string>(nullable: true),
+                    Number = table.Column<string>(nullable: true),
+                    PostCode = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    Country = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -26,6 +31,11 @@ namespace Bank.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     FirstName = table.Column<string>(nullable: true),
                     LastName = table.Column<string>(nullable: true),
+                    Street = table.Column<string>(nullable: true),
+                    Number = table.Column<string>(nullable: true),
+                    PostCode = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    Country = table.Column<string>(nullable: true),
                     PhoneNumber = table.Column<string>(nullable: true),
                     Email = table.Column<string>(nullable: true)
                 },
@@ -68,13 +78,13 @@ namespace Bank.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     AccountId = table.Column<Guid>(nullable: false),
                     Date = table.Column<DateTime>(nullable: false),
-                    TransactionType = table.Column<int>(nullable: false),
+                    TransactionType = table.Column<string>(nullable: false),
                     Value = table.Column<decimal>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Transactions", x => x.Id);
-                    table.CheckConstraint("CK_Transactions_TransactionType_Enum_Constraint", "[TransactionType] IN(0, 1)");
+                    table.CheckConstraint("CK_Transactions_TransactionType_Enum_Constraint", "[TransactionType] IN(N'Income', N'Outcome')");
                     table.ForeignKey(
                         name: "FK_Transactions_Accounts_AccountId",
                         column: x => x.AccountId,
