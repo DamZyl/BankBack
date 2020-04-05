@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Bank.Models.Commands;
 using Bank.Models.Dtos;
 using Bank.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.Controllers
@@ -18,6 +19,7 @@ namespace Bank.Controllers
             _bankService = bankService;
         }
 
+        //[Authorize(Roles = "Employee, Admin, Customer")]
         [HttpGet]
         public async Task<ActionResult<BankDetailsDto>> Get()
             => new JsonResult(await _bankService.GetInfoAsync());
