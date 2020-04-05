@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Bank.Extensions;
 using Bank.Infrastructure.Mappers;
 using Bank.Infrastructure.Repositories;
 using Bank.Models;
@@ -26,13 +27,7 @@ namespace Bank.Services
         
         public async Task<IEnumerable<AccountDetailsDto>> GetCustomerAccountsAsync(Guid customerId)
         {
-            var customer = await _customerRepository.GetCustomerByIdAsync(customerId);
-
-            if (customer == null)
-            {
-                throw new Exception("Customer doesn't exist.");
-            }
-
+            var customer = await _customerRepository.GetOrFailAsync(customerId);
             var accounts = await _accountRepository.GetCustomerAccountsAsync(customer.Id);
 
             return accounts.Select(Mapper.MapAccountToAccountDetailsDto).ToList();
@@ -40,31 +35,15 @@ namespace Bank.Services
 
         public async Task<AccountDetailsDto> GetAccountAsync(Guid id)
         {
-            var account = await _accountRepository.GetAccountAsync(id);
-
-            if (account == null)
-            {
-                throw new Exception("Account doesn't exist.");
-            }
+            var account = await _accountRepository.GetOrFailAsync(id);
 
             return Mapper.MapAccountToAccountDetailsDto(account);
         }
 
         public async Task CreateAccountAsync(CreateAccount command)
         {
-            var bank = await _bankRepository.GetInfoAsync();
-
-            if (bank == null)
-            {
-                throw new Exception("Bank doesn't exist.");
-            }
-
-            var customer = await _customerRepository.GetCustomerByIdAsync(command.CustomerId);
-
-            if (customer == null)
-            {
-                throw new Exception("Customer doesn't exist.");
-            }
+            var bank = await _bankRepository.GetOrFailAsync();
+            var customer = await _customerRepository.GetOrFailAsync(command.CustomerId);
 
             var account = new Account
             {
@@ -80,12 +59,7 @@ namespace Bank.Services
 
         public async Task DeleteAccountAsync(Guid id)
         {
-            var account = await _accountRepository.GetAccountAsync(id);
-
-            if (account == null)
-            {
-                throw new Exception("Account doesn't exist.");
-            }
+            var account = await _accountRepository.GetOrFailAsync(id);
 
             await _accountRepository.DeleteAccountAsync(account);
         }
