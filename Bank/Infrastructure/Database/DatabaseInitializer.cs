@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Bank.Models;
+using Bank.Models.Enums;
 using BankEntity = Bank.Models.Bank;
 
 namespace Bank.Infrastructure.Database
@@ -113,6 +114,7 @@ namespace Bank.Infrastructure.Database
                     AccountId = Guid.Parse("21C350E8-E3C7-425C-8335-BDEEDD9ACA89"),
                     Date = DateTime.Now.AddDays(-5),
                     TransactionType = TransactionType.Income,
+                    Description = "Wynagrodzenie",
                     Value = 1800M
                 },
                 new Transaction
@@ -121,6 +123,7 @@ namespace Bank.Infrastructure.Database
                     AccountId = Guid.Parse("21C350E8-E3C7-425C-8335-BDEEDD9ACA89"),
                     Date = DateTime.Now.AddDays(-3),
                     TransactionType = TransactionType.Income,
+                    Description = "Premia",
                     Value = 200M
                 },
                 new Transaction
@@ -129,6 +132,7 @@ namespace Bank.Infrastructure.Database
                     AccountId = Guid.Parse("21C350E8-E3C7-425C-8335-BDEEDD9ACA89"),
                     Date = DateTime.Now.AddDays(-1),
                     TransactionType = TransactionType.Outcome,
+                    Description = "Zakupy",
                     Value = 800M
                 },
                 new Transaction
@@ -137,6 +141,7 @@ namespace Bank.Infrastructure.Database
                     AccountId = Guid.Parse("21C350E8-E3C7-425C-8335-BDEEDD9ACA89"),
                     Date = DateTime.Now,
                     TransactionType = TransactionType.Outcome,
+                    Description = "Zwrot kosztów",
                     Value = 300M
                 }
             };

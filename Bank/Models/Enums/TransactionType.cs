@@ -1,4 +1,4 @@
-namespace Bank.Models
+namespace Bank.Models.Enums
 {
     public enum TransactionType
     {

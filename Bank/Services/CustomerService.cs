@@ -51,30 +51,6 @@ namespace Bank.Services
             return Mapper.MapCustomerToCustomerDetailsDto(customer);
         }
 
-        public async Task CreateCustomerAsync(CreateCustomer command)
-        {
-            var customer = await _customerRepository.GetOrFailAsync(command.Email);
-
-            customer = new Customer
-            {
-                Id = command.Id,
-                FirstName = command.FirstName,
-                LastName = command.LastName,
-                Email = command.Email,
-                PhoneNumber = command.PhoneNumber,
-                Address = new Address
-                {
-                    Street = command.Street,
-                    Number = command.Number,
-                    PostCode = command.PostCode,
-                    City = command.City,
-                    Country = command.Country
-                }
-            };
-
-            await _customerRepository.AddCustomerAsync(customer);
-        }
-
         public async Task UpdateCustomerAsync(Guid id, UpdateCustomer command)
         {
             var customer = await _customerRepository.GetOrFailAsync(id);
@@ -92,13 +68,6 @@ namespace Bank.Services
             customer.Email = command.Email;
 
             await _customerRepository.UpdateCustomerAsync(customer);
-        }
-
-        public async Task DeleteCustomerAsync(Guid id)
-        {
-            var customer = await _customerRepository.GetOrFailAsync(id);
-
-            await _customerRepository.DeleteCustomerAsync(customer);
         }
     }
 }

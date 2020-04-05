@@ -5,21 +5,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/account")]
     [ApiController]
     public class TransactionController : ControllerBase
     {
-        private readonly ITransactionService _transactionService;
+        private readonly IAccountService _accountService;
 
-        public TransactionController(ITransactionService transactionService)
+        public TransactionController(IAccountService accountService)
         {
-            _transactionService = transactionService;
+            _accountService = accountService;
         }
 
-        [HttpPost]
+        [HttpPost("{id}/transaction")]
         public async Task<ActionResult> CreateTransaction([FromBody] CreateTransaction command)
         {
-            await _transactionService.CreateTransactionAsync(command);
+            await _accountService.CreateTransactionAsync(command);
 
             return CreatedAtAction(null, null, null);
         }

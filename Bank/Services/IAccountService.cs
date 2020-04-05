@@ -10,7 +10,6 @@ namespace Bank.Services
     {
         Task<IEnumerable<AccountDetailsDto>> GetCustomerAccountsAsync(Guid customerId);
         Task<AccountDetailsDto> GetAccountAsync(Guid id);
-        Task CreateAccountAsync(CreateAccount command);
-        Task DeleteAccountAsync(Guid id);
+        Task CreateTransactionAsync(CreateTransaction command);
     }
 }

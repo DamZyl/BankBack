@@ -8,6 +8,7 @@ using Bank.Infrastructure.Repositories;
 using Bank.Models;
 using Bank.Models.Commands;
 using Bank.Models.Dtos;
+using Bank.Models.Enums;
 
 namespace Bank.Services
 {
@@ -25,6 +26,7 @@ namespace Bank.Services
             _bankRepository = bankRepository;
         }
         
+        // Delete MAP customer to show all accounts and transactions
         public async Task<IEnumerable<AccountDetailsDto>> GetCustomerAccountsAsync(Guid customerId)
         {
             var customer = await _customerRepository.GetOrFailAsync(customerId);
@@ -39,29 +41,25 @@ namespace Bank.Services
 
             return Mapper.MapAccountToAccountDetailsDto(account);
         }
-
-        public async Task CreateAccountAsync(CreateAccount command)
+        
+        public async Task CreateTransactionAsync(CreateTransaction command)
         {
-            var bank = await _bankRepository.GetOrFailAsync();
-            var customer = await _customerRepository.GetOrFailAsync(command.CustomerId);
+            var account = await _accountRepository.GetOrFailAsync(command.AccountId);
 
-            var account = new Account
+            var transaction = new Transaction
             {
                 Id = command.Id,
-                BankId = command.BankId,
-                CustomerId = command.CustomerId,
-                AccountNumber = command.AccountNumber,
-                Balance = command.Balance
+                AccountId = command.AccountId,
+                Date = command.Date,
+                TransactionType = Enum.Parse<TransactionType>(command.TransactionType),
+                Description = command.Description,
+                Value = command.Value
             };
+            
+            account.Transactions.Add(transaction);
+            account.Balance = account.SumBalance();
 
-            await _accountRepository.AddAccountAsync(account);
-        }
-
-        public async Task DeleteAccountAsync(Guid id)
-        {
-            var account = await _accountRepository.GetOrFailAsync(id);
-
-            await _accountRepository.DeleteAccountAsync(account);
+            await _accountRepository.UpdateAccountAsync(account);
         }
     }
 }

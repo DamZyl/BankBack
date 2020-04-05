@@ -11,8 +11,6 @@ namespace Bank.Services
         Task<IEnumerable<CustomerDetailsDto>> GetCustomersAsync();
         Task<CustomerDetailsDto> GetCustomerByIdAsync(Guid id);
         Task<CustomerDetailsDto> GetCustomerByMailAsync(string email);
-        Task CreateCustomerAsync(CreateCustomer command);
         Task UpdateCustomerAsync(Guid id, UpdateCustomer command);
-        Task DeleteCustomerAsync(Guid id);
     }
 }
