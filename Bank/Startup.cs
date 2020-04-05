@@ -61,6 +61,7 @@ namespace Bank
             services.AddScoped<IBankRepository, BankRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
             #endregion
 
@@ -69,6 +70,7 @@ namespace Bank
             services.AddScoped<IBankService, BankService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IJwtHandler, JwtHandler>();
             services.AddScoped<IAuthService, AuthService>();
 

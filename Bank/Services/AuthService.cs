@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Bank.Infrastructure.Auth;
 using Bank.Infrastructure.Auth.Models;
 using Bank.Infrastructure.Repositories;
+using Bank.Models;
 using Bank.Models.Commands;
 
 namespace Bank.Services
@@ -10,14 +11,14 @@ namespace Bank.Services
     public class AuthService : IAuthService
     {
         private readonly ICustomerRepository _customerRepository;
-        //private readonly IEmployeeRepository _employeeRepository; -> ADD LATER!!! ONLY TEST NOW
+        private readonly IEmployeeRepository _employeeRepository;
         private readonly IJwtHandler _jwtHandler;
 
-        public AuthService(ICustomerRepository customerRepository, IJwtHandler jwtHandler)
-            //IEmployeeRepository employeeRepository)
+        public AuthService(ICustomerRepository customerRepository, IJwtHandler jwtHandler,
+            IEmployeeRepository employeeRepository)
         {
             _customerRepository = customerRepository;
-            // _employeeRepository = employeeRepository;
+            _employeeRepository = employeeRepository;
             _jwtHandler = jwtHandler;
         }
         
@@ -31,27 +32,44 @@ namespace Bank.Services
         {
             var customer = await _customerRepository.GetCustomerByMailAsync(command.Email);
 
-            if (customer == null)
+            if (IsUserValid(customer, command.Password))
             {
-                throw new Exception("Invalid credentials.");
+                return CreateToken(customer, _jwtHandler);
             }
 
-            if (customer.Password != command.Password)
+            var employee = await _employeeRepository.GetEmployeeByMailAsync(command.Email);
+
+            if (IsUserValid(employee, command.Password))
             {
-                throw new Exception("Invalid credentials.");
+                return CreateToken(employee, _jwtHandler);
+            }
+            
+            throw new Exception("Invalid credentials.");
+        }
+
+        private static bool IsUserValid<T>(T user, string password) where T : User
+        {
+            if (user == null)
+            {
+                return false;
             }
 
-            var jwt = _jwtHandler.CreateToken(customer.Id, $"{customer.FirstName} {customer.LastName}",
-                customer.RoleInSystem.ToString());
+            return user.Password == password;
+        }
+
+        private static TokenDto CreateToken<T>(T user, IJwtHandler jwtHandler) where T : User
+        {
+            var jwt = jwtHandler.CreateToken(user.Id, $"{ user.FirstName } { user.LastName }",
+                user.RoleInSystem.ToString());
 
             return new TokenDto
             {
                 Token = jwt.Token,
                 Expires = jwt.Expires,
-                Role = customer.RoleInSystem.ToString()
+                Role = user.RoleInSystem.ToString()
             };
         }
-        
+
         // ADD HASH PASSWORD LATER!!!
     }
 }

@@ -44,6 +44,30 @@ namespace Bank.Extensions
             return null;
         }
         
+        public static async Task<Employee> GetOrFailAsync(this IEmployeeRepository repository, Guid id)
+        {
+            var employee = await repository.GetEmployeeByIdAsync(id);
+
+            if (employee == null)
+            {
+                throw new Exception("Employee doesn't exist.");
+            }
+
+            return employee;
+        }
+        
+        public static async Task<Employee> GetOrFailAsync(this IEmployeeRepository repository, string email)
+        {
+            var employee = await repository.GetEmployeeByMailAsync(email);
+
+            if (employee != null)
+            {
+                throw new Exception("Employee exists.");
+            }
+
+            return null;
+        }
+        
         public static async Task<BankEntity> GetOrFailAsync(this IBankRepository repository)
         {
             var bank = await repository.GetInfoAsync();

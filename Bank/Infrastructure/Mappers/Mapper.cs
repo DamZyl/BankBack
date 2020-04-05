@@ -37,6 +37,18 @@ namespace Bank.Infrastructure.Mappers
             };
         }
 
+        public static EmployeeDto MapEmployeeToEmployeeDto(Employee employee)
+        {
+            return new EmployeeDto
+            {
+                Id = employee.Id,
+                FullName = $"{ employee.FirstName } { employee.LastName }",
+                Email = employee.Email,
+                PhoneNumber = employee.PhoneNumber,
+                Position = employee.Position
+            };
+        }
+
         public static AccountDetailsDto MapAccountToAccountDetailsDto(Account account)
         {
             return new AccountDetailsDto
