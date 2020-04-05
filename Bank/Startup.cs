@@ -1,9 +1,9 @@
 using Bank.Infrastructure.Database;
 using Bank.Infrastructure.Repositories;
+using Bank.Options;
 using Bank.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,9 +21,8 @@ namespace Bank
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = Configuration.GetSection("SqlLinux")["ConnectionString"];
-
-            services.AddDbContext<BankContext>(options => options.UseSqlServer(connectionString));
+            services.Configure<SqlOptions>(Configuration.GetSection("SqlLinux"));
+            services.AddDbContext<BankContext>();
             services.AddTransient<DatabaseInitializer>();
             
             services.AddScoped<IBankRepository, BankRepository>();

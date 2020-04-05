@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Bank.Extensions;
 using Bank.Infrastructure.Mappers;
 using Bank.Infrastructure.Repositories;
 using Bank.Models;
@@ -33,12 +34,7 @@ namespace Bank.Services
 
         public async Task<CustomerDetailsDto> GetCustomerByIdAsync(Guid id)
         {
-            var customer = await _customerRepository.GetCustomerByIdAsync(id);
-
-            if (customer == null)
-            {
-                throw new Exception("Customer doesn't exist.");
-            }
+            var customer = await _customerRepository.GetOrFailAsync(id);
 
             return Mapper.MapCustomerToCustomerDetailsDto(customer);
         }
@@ -57,12 +53,7 @@ namespace Bank.Services
 
         public async Task CreateCustomerAsync(CreateCustomer command)
         {
-            var customer = await _customerRepository.GetCustomerByMailAsync(command.Email);
-
-            if (customer != null)
-            {
-                throw new Exception("Customer exists.");
-            }
+            var customer = await _customerRepository.GetOrFailAsync(command.Email);
 
             customer = new Customer
             {
@@ -86,13 +77,8 @@ namespace Bank.Services
 
         public async Task UpdateCustomerAsync(Guid id, UpdateCustomer command)
         {
-            var customer = await _customerRepository.GetCustomerByIdAsync(id);
-
-            if (customer == null)
-            {
-                throw new Exception("Customer doesn't exist.");
-            }
-
+            var customer = await _customerRepository.GetOrFailAsync(id);
+            
             customer.Address = new Address
             {
                 Street = command.Street,
@@ -110,12 +96,7 @@ namespace Bank.Services
 
         public async Task DeleteCustomerAsync(Guid id)
         {
-            var customer = await _customerRepository.GetCustomerByIdAsync(id);
-
-            if (customer == null)
-            {
-                throw new Exception("Customer doesn't exist.");
-            }
+            var customer = await _customerRepository.GetOrFailAsync(id);
 
             await _customerRepository.DeleteCustomerAsync(customer);
         }

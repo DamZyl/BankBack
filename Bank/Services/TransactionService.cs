@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Bank.Extensions;
 using Bank.Infrastructure.Repositories;
 using Bank.Models;
 using Bank.Models.Commands;
@@ -20,13 +21,8 @@ namespace Bank.Services
         
         public async Task CreateTransactionAsync(CreateTransaction command)
         {
-            var account = await _accountRepository.GetAccountAsync(command.AccountId);
+            var account = await _accountRepository.GetOrFailAsync(command.AccountId);
 
-            if (account == null)
-            {
-                throw new Exception("Account doesn't exist.");
-            }
-            
             var transaction = new Transaction
             {
                 Id = command.Id,

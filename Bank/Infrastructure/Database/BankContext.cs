@@ -1,100 +1,42 @@
+using Bank.Infrastructure.Database.Configurations;
 using Bank.Models;
+using Bank.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using BankEntity = Bank.Models.Bank;
 
 namespace Bank.Infrastructure.Database
 {
     public class BankContext : DbContext
     {
+        private readonly IOptions<SqlOptions> _sqlOptions;
+        
         public DbSet<Account> Accounts { get; set; }
         public DbSet<BankEntity> Banks { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
-        
-        public BankContext(DbContextOptions options) : base(options) {  }
+
+        public BankContext(IOptions<SqlOptions> sqlOptions)
+        {
+            _sqlOptions = sqlOptions;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (optionsBuilder.IsConfigured)
+            {
+                return;
+            }
+
+            optionsBuilder.UseSqlServer(_sqlOptions.Value.ConnectionString);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
-            #region Ignore
-
-            modelBuilder.Ignore<Address>();
-
-            #endregion
-            
-            #region BankConfig
-
-            modelBuilder.Entity<BankEntity>()
-                .HasKey(x => x.Id);
-
-            modelBuilder.Entity<BankEntity>(tab =>
-                tab.OwnsOne(
-                    x => x.Address,
-                    address =>
-                    {
-                        address.Property(x => x.Street).HasColumnName("Street");
-                        address.Property(x => x.Number).HasColumnName("Number");
-                        address.Property(x => x.PostCode).HasColumnName("PostCode");
-                        address.Property(x => x.City).HasColumnName("City");
-                        address.Property(x => x.Country).HasColumnName("Country");
-                    }
-                ));
-            
-            #endregion
-
-            #region AccountConfig
-
-            modelBuilder.Entity<Account>()
-                .HasKey(x => x.Id);
-            
-            modelBuilder.Entity<Account>()
-                .HasOne(x => x.Bank)
-                .WithMany(x => x.Accounts)
-                .HasForeignKey(x => x.BankId);
-            
-            modelBuilder.Entity<Account>()
-                .HasOne(x => x.Customer)
-                .WithMany(x => x.Accounts)
-                .HasForeignKey(x => x.CustomerId);
-
-            #endregion
-
-            #region CustomerConfig
-
-            modelBuilder.Entity<Customer>()
-                .HasKey(x => x.Id);
-            
-            modelBuilder.Entity<Customer>(tab =>
-                tab.OwnsOne(
-                    x => x.Address,
-                    address =>
-                    {
-                        address.Property(x => x.Street).HasColumnName("Street");
-                        address.Property(x => x.Number).HasColumnName("Number");
-                        address.Property(x => x.PostCode).HasColumnName("PostCode");
-                        address.Property(x => x.City).HasColumnName("City");
-                        address.Property(x => x.Country).HasColumnName("Country");
-                    }
-                ));
-
-            #endregion
-
-            #region TransactionConfig
-
-            modelBuilder.Entity<Transaction>()
-                .HasKey(x => x.Id);
-
-            modelBuilder.Entity<Transaction>()
-                .HasOne(x => x.Account)
-                .WithMany(x => x.Transactions)
-                .HasForeignKey(x => x.AccountId);
-            
-            modelBuilder.Entity<Transaction>()
-                .Property(x => x.TransactionType)
-                .HasConversion<string>();
-
-            #endregion
+            modelBuilder.ApplyConfiguration(new BankConfiguration());
+            modelBuilder.ApplyConfiguration(new AccountConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomerConfiguration());
+            modelBuilder.ApplyConfiguration(new TransactionConfiguration());
         }
     }
 }
