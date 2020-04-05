@@ -28,8 +28,13 @@ namespace Bank.Infrastructure.Database
             {
                 await _bankContext.AddAsync(AddCustomer());
             }
+            
+            if (!_bankContext.Employees.Any())
+            {
+                await _bankContext.AddAsync(AddEmployee());
+            }
 
-            if (!_bankContext.Customers.Any())
+            if (!_bankContext.Accounts.Any())
             {
                 await _bankContext.AddRangeAsync(AddAccounts());
             }
@@ -78,6 +83,23 @@ namespace Bank.Infrastructure.Database
                 },
                 Email = "anowak@gmail.com",
                 PhoneNumber = "515-098-789",
+                Password = "customer111",
+                RoleInSystem = RoleType.Customer
+            };
+        }
+        
+        private static Employee AddEmployee()
+        {
+            return new Employee
+            {
+                Id = Guid.Parse("DB5118DD-E555-44E8-B3CE-E0AB20C8E809"),
+                FirstName = "Jan",
+                LastName = "Kowalski",
+                Email = "jkowalski@gmail.com",
+                PhoneNumber = "545-098-789",
+                Password = "admin111",
+                RoleInSystem = RoleType.Admin,
+                Position = "Administrator"
             };
         }
 

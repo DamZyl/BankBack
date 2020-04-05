@@ -21,6 +21,8 @@ namespace Bank.Infrastructure.Database.Configurations
                         address.Property(x => x.Country).HasColumnName("Country");
                     }
                 );
+
+            builder.Property(x => x.RoleInSystem).HasConversion<string>();
         }
     }
 }
