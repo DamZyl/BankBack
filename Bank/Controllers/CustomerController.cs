@@ -31,26 +31,10 @@ namespace Bank.Controllers
         public async Task<ActionResult<CustomerDetailsDto>> GetCustomerByMail(string email)
             => new JsonResult(await _customerService.GetCustomerByMailAsync(email));
 
-        [HttpPost]
-        public async Task<ActionResult> CreateCustomer([FromBody] CreateCustomer command)
-        {
-            await _customerService.CreateCustomerAsync(command);
-
-            return CreatedAtAction(null, null, null);
-        }
-
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateCustomer(Guid id, [FromBody] UpdateCustomer command)
         {
             await _customerService.UpdateCustomerAsync(id, command);
-
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteCustomer(Guid id)
-        {
-            await _customerService.DeleteCustomerAsync(id);
 
             return NoContent();
         }

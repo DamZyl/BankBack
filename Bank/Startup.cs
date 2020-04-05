@@ -21,18 +21,29 @@ namespace Bank
 
         public void ConfigureServices(IServiceCollection services)
         {
+            #region Database
+
             services.Configure<SqlOptions>(Configuration.GetSection("SqlLinux"));
             services.AddDbContext<BankContext>();
             services.AddTransient<DatabaseInitializer>();
-            
+
+            #endregion
+
+            #region Repositories
+
             services.AddScoped<IBankRepository, BankRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<ITransactionRepository, TransactionRepository>();
+
+            #endregion
+
+            #region Services
+
             services.AddScoped<IBankService, BankService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<ITransactionService, TransactionService>();
+
+            #endregion
             
             services.AddControllers();
         }

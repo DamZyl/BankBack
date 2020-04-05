@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Bank.Models.Commands;
 using Bank.Models.Dtos;
 using Bank.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -26,21 +25,5 @@ namespace Bank.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<AccountDetailsDto>> GetAccountById(Guid id)
             => new JsonResult(await _accountService.GetAccountAsync(id));
-        
-        [HttpPost]
-        public async Task<ActionResult> CreateCustomer([FromBody] CreateAccount command)
-        {
-            await _accountService.CreateAccountAsync(command);
-
-            return CreatedAtAction(null, null, null);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteCustomer(Guid id)
-        {
-            await _accountService.DeleteAccountAsync(id);
-
-            return NoContent();
-        }
     }
 }
