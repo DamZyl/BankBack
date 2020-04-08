@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Bank.Extensions;
 using Bank.Infrastructure.Mappers;
 using Bank.Infrastructure.Repositories;
+using Bank.Middlewares.Exceptions;
 using Bank.Models.Commands;
 using Bank.Models.Dtos;
 
@@ -25,7 +26,7 @@ namespace Bank.Services
 
             if (employees == null)
             {
-                throw new Exception("No employees");
+                throw new BusinessException(ErrorCodes.NoExist,"No employees");
             }
 
             return employees.Select(Mapper.MapEmployeeToEmployeeDto).ToList();
@@ -44,7 +45,7 @@ namespace Bank.Services
 
             if (employee == null)
             {
-                throw new Exception("Employee doesn't exist.");
+                throw new BusinessException(ErrorCodes.NoExist,"Employee doesn't exist.");
             }
 
             return Mapper.MapEmployeeToEmployeeDto(employee);

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Security.Cryptography;
+using Bank.Middlewares.Exceptions;
 
 namespace Bank.Infrastructure.Auth
 {
@@ -25,7 +26,7 @@ namespace Bank.Infrastructure.Auth
 
             if (parts.Length != 3)
             {
-                throw new Exception("Invalid credentials.");
+                throw new BusinessException(ErrorCodes.InvalidCredentials, "Invalid credentials.");
             }
 
             var iterations = Convert.ToInt32(parts[0]);

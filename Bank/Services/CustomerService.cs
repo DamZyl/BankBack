@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Bank.Extensions;
 using Bank.Infrastructure.Mappers;
 using Bank.Infrastructure.Repositories;
+using Bank.Middlewares.Exceptions;
 using Bank.Models;
 using Bank.Models.Commands;
 using Bank.Models.Dtos;
@@ -26,7 +27,7 @@ namespace Bank.Services
 
             if (customers == null)
             {
-                throw new Exception("No customers.");
+                throw new BusinessException(ErrorCodes.NoExist,"No customers.");
             }
 
             return customers.Select(Mapper.MapCustomerToCustomerDetailsDto).ToList();
@@ -45,7 +46,7 @@ namespace Bank.Services
 
             if (customer == null)
             {
-                throw new Exception("Customer doesn't exist.");
+                throw new BusinessException(ErrorCodes.NoExist,"Customer doesn't exist.");
             }
 
             return Mapper.MapCustomerToCustomerDetailsDto(customer);

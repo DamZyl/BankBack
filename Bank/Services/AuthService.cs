@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Bank.Infrastructure.Auth;
 using Bank.Infrastructure.Auth.Models;
 using Bank.Infrastructure.Repositories;
+using Bank.Middlewares.Exceptions;
 using Bank.Models;
 using Bank.Models.Commands;
 
@@ -46,7 +47,7 @@ namespace Bank.Services
                 return CreateToken(employee, _jwtHandler);
             }
             
-            throw new Exception("Invalid credentials.");
+            throw new BusinessException(ErrorCodes.InvalidCredentials,"Invalid credentials.");
         }
 
         private bool IsUserValid<T>(T user, string password) where T : User

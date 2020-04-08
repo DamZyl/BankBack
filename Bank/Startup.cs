@@ -3,6 +3,7 @@ using Bank.Infrastructure.Auth;
 using Bank.Infrastructure.Auth.Models;
 using Bank.Infrastructure.Database;
 using Bank.Infrastructure.Repositories;
+using Bank.Middlewares;
 using Bank.Options;
 using Bank.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -102,6 +103,12 @@ namespace Bank
                 x.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
 
+            app.UseCors(x => 
+                    x.WithOrigins("http://localhost:4200")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                );
+            
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             
@@ -111,6 +118,8 @@ namespace Bank
             
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseErrorHandler();
             
             app.UseEndpoints(endpoints =>
             {

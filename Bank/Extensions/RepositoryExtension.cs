@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Bank.Infrastructure.Repositories;
+using Bank.Middlewares.Exceptions;
 using Bank.Models;
 using BankEntity = Bank.Models.Bank;
 
@@ -14,7 +15,7 @@ namespace Bank.Extensions
 
             if (account == null)
             {
-                throw new Exception("Account doesn't exist.");
+                throw new BusinessException(ErrorCodes.NoExist, "Account doesn't exist.");
             }
 
             return account;
@@ -26,7 +27,7 @@ namespace Bank.Extensions
 
             if (customer == null)
             {
-                throw new Exception("Customer doesn't exist.");
+                throw new BusinessException(ErrorCodes.NoExist,"Customer doesn't exist.");
             }
 
             return customer;
@@ -38,7 +39,7 @@ namespace Bank.Extensions
 
             if (customer != null)
             {
-                throw new Exception("Customer exists.");
+                throw new BusinessException(ErrorCodes.Exist,"Customer exists.");
             }
 
             return null;
@@ -50,7 +51,7 @@ namespace Bank.Extensions
 
             if (employee == null)
             {
-                throw new Exception("Employee doesn't exist.");
+                throw new BusinessException(ErrorCodes.NoExist,"Employee doesn't exist.");
             }
 
             return employee;
@@ -62,7 +63,7 @@ namespace Bank.Extensions
 
             if (employee != null)
             {
-                throw new Exception("Employee exists.");
+                throw new BusinessException(ErrorCodes.Exist,"Employee exists.");
             }
 
             return null;
@@ -74,7 +75,7 @@ namespace Bank.Extensions
 
             if (bank == null)
             {
-                throw new Exception("Bank doesn't exist.");
+                throw new BusinessException(ErrorCodes.NoExist,"Bank doesn't exist.");
             }
 
             return bank;
