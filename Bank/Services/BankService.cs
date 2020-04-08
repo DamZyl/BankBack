@@ -1,11 +1,13 @@
 using System;
 using System.Threading.Tasks;
 using Bank.Extensions;
+using Bank.Infrastructure.Auth;
 using Bank.Infrastructure.Mappers;
 using Bank.Infrastructure.Repositories;
 using Bank.Models;
 using Bank.Models.Commands;
 using Bank.Models.Dtos;
+using Bank.Models.Enums;
 
 namespace Bank.Services
 {
@@ -14,13 +16,15 @@ namespace Bank.Services
         private readonly IBankRepository _bankRepository;
         private readonly ICustomerRepository _customerRepository;
         private readonly IAccountRepository _accountRepository;
+        private readonly IPasswordHasher _passwordHasher;
 
         public BankService(IBankRepository bankRepository, ICustomerRepository customerRepository,
-            IAccountRepository accountRepository)
+            IAccountRepository accountRepository, IPasswordHasher passwordHasher)
         {
             _bankRepository = bankRepository;
             _customerRepository = customerRepository;
             _accountRepository = accountRepository;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<BankDetailsDto> GetInfoAsync()
@@ -48,7 +52,9 @@ namespace Bank.Services
                     PostCode = command.PostCode,
                     City = command.City,
                     Country = command.Country
-                }
+                },
+                Password = _passwordHasher.Hash(command.Password),
+                RoleInSystem = RoleType.Customer
             };
 
             await _customerRepository.AddCustomerAsync(customer);

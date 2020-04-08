@@ -72,6 +72,7 @@ namespace Bank
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IJwtHandler, JwtHandler>();
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IAuthService, AuthService>();
 
             #endregion

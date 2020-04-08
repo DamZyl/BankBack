@@ -13,13 +13,15 @@ namespace Bank.Services
         private readonly ICustomerRepository _customerRepository;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IJwtHandler _jwtHandler;
+        private readonly IPasswordHasher _passwordHasher;
 
         public AuthService(ICustomerRepository customerRepository, IJwtHandler jwtHandler,
-            IEmployeeRepository employeeRepository)
+            IEmployeeRepository employeeRepository, IPasswordHasher passwordHasher)
         {
             _customerRepository = customerRepository;
             _employeeRepository = employeeRepository;
             _jwtHandler = jwtHandler;
+            _passwordHasher = passwordHasher;
         }
         
         // LATER!!!
@@ -47,14 +49,9 @@ namespace Bank.Services
             throw new Exception("Invalid credentials.");
         }
 
-        private static bool IsUserValid<T>(T user, string password) where T : User
+        private bool IsUserValid<T>(T user, string password) where T : User
         {
-            if (user == null)
-            {
-                return false;
-            }
-
-            return user.Password == password;
+            return user != null && _passwordHasher.Check(user.Password, password);
         }
 
         private static TokenDto CreateToken<T>(T user, IJwtHandler jwtHandler) where T : User
@@ -69,7 +66,5 @@ namespace Bank.Services
                 Role = user.RoleInSystem.ToString()
             };
         }
-
-        // ADD HASH PASSWORD LATER!!!
     }
 }
