@@ -6,7 +6,7 @@ namespace Bank.Services
 {
     public interface IAuthService
     {
-        Task RegisterAsync(Register command);
+        Task RegisterAsync(CreateCustomer command);
         Task<TokenDto> LoginAsync(Login command);
     }
 }

@@ -1,11 +1,12 @@
-using System;
 using System.Threading.Tasks;
+using Bank.Extensions;
 using Bank.Infrastructure.Auth;
 using Bank.Infrastructure.Auth.Models;
 using Bank.Infrastructure.Repositories;
 using Bank.Middlewares.Exceptions;
 using Bank.Models;
 using Bank.Models.Commands;
+using Bank.Models.Enums;
 
 namespace Bank.Services
 {
@@ -25,10 +26,30 @@ namespace Bank.Services
             _passwordHasher = passwordHasher;
         }
         
-        // LATER!!!
-        public Task RegisterAsync(Register command)
+        public async Task RegisterAsync(CreateCustomer command)
         {
-            throw new System.NotImplementedException();
+            var customer = await _customerRepository.GetOrFailAsync(command.Email);
+
+            customer = new Customer
+            {
+                Id = command.Id,
+                FirstName = command.FirstName,
+                LastName = command.LastName,
+                Email = command.Email,
+                PhoneNumber = command.PhoneNumber,
+                Address = new Address
+                {
+                    Street = command.Street,
+                    Number = command.Number,
+                    PostCode = command.PostCode,
+                    City = command.City,
+                    Country = command.Country
+                },
+                Password = _passwordHasher.Hash(command.Password),
+                RoleInSystem = RoleType.Customer
+            };
+
+            await _customerRepository.AddCustomerAsync(customer);
         }
 
         public async Task<TokenDto> LoginAsync(Login command)

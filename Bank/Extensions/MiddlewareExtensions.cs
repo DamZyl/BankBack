@@ -1,7 +1,7 @@
 using Bank.Middlewares.Exceptions;
 using Microsoft.AspNetCore.Builder;
 
-namespace Bank.Middlewares
+namespace Bank.Extensions
 {
     public static class MiddlewareExtensions
     {

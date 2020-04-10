@@ -15,16 +15,19 @@ namespace Bank.Services
     {
         private readonly IBankRepository _bankRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IEmployeeRepository _employeeRepository;
         private readonly IAccountRepository _accountRepository;
         private readonly IPasswordHasher _passwordHasher;
 
         public BankService(IBankRepository bankRepository, ICustomerRepository customerRepository,
-            IAccountRepository accountRepository, IPasswordHasher passwordHasher)
+            IAccountRepository accountRepository, IPasswordHasher passwordHasher, 
+            IEmployeeRepository employeeRepository)
         {
             _bankRepository = bankRepository;
             _customerRepository = customerRepository;
             _accountRepository = accountRepository;
             _passwordHasher = passwordHasher;
+            _employeeRepository = employeeRepository;
         }
 
         public async Task<BankDetailsDto> GetInfoAsync()
@@ -65,6 +68,32 @@ namespace Bank.Services
             var customer = await _customerRepository.GetOrFailAsync(id);
 
             await _customerRepository.DeleteCustomerAsync(customer);
+        }
+
+        public async Task CreateEmployeeAsync(CreateEmployee command)
+        {
+            var employee = await _employeeRepository.GetOrFailAsync(command.Email);
+            
+            employee = new Employee
+            {
+                Id = command.Id,
+                FirstName = command.FirstName,
+                LastName = command.LastName,
+                Email = command.Email,
+                PhoneNumber = command.PhoneNumber,
+                Password = _passwordHasher.Hash(command.Password),
+                RoleInSystem = Enum.Parse<RoleType>(command.RoleInSystem),
+                Position = command.Position
+            };
+
+            await _employeeRepository.AddEmployeeAsync(employee);
+        }
+
+        public async Task DeleteEmployeeAsync(Guid id)
+        {
+            var employee = await _employeeRepository.GetOrFailAsync(id);
+
+            await _employeeRepository.DeleteEmployeeAsync(employee);
         }
 
         public async Task CreateAccountAsync(CreateAccount command)

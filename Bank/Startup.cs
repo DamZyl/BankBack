@@ -1,9 +1,8 @@
 using System.Text;
 using Bank.Infrastructure.Auth;
-using Bank.Infrastructure.Auth.Models;
 using Bank.Infrastructure.Database;
 using Bank.Infrastructure.Repositories;
-using Bank.Middlewares;
+using Bank.Extensions;
 using Bank.Options;
 using Bank.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

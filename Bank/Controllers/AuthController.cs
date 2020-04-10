@@ -22,7 +22,7 @@ namespace Bank.Controllers
             => new JsonResult(await _authService.LoginAsync(command));
 
         [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody] Register command)
+        public async Task<ActionResult> Register([FromBody] CreateCustomer command)
         {
             await _authService.RegisterAsync(command);
             
