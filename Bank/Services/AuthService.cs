@@ -52,7 +52,7 @@ namespace Bank.Services
             await _customerRepository.AddCustomerAsync(customer);
         }
 
-        public async Task<TokenDto> LoginAsync(Login command)
+        public async Task<string> LoginAsync(Login command)
         {
             var customer = await _customerRepository.GetCustomerByMailAsync(command.Email);
 
@@ -76,17 +76,18 @@ namespace Bank.Services
             return user != null && _passwordHasher.Check(user.Password, password);
         }
 
-        private static TokenDto CreateToken<T>(T user, IJwtHandler jwtHandler) where T : User
+        private static string CreateToken<T>(T user, IJwtHandler jwtHandler) where T : User
         {
             var jwt = jwtHandler.CreateToken(user.Id, $"{ user.FirstName } { user.LastName }",
                 user.RoleInSystem.ToString());
 
-            return new TokenDto
+            /*return new TokenDto
             {
                 Token = jwt.Token,
                 Expires = jwt.Expires,
                 Role = user.RoleInSystem.ToString()
-            };
+            };*/
+            return jwt.Token;
         }
     }
 }
