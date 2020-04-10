@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Bank.Infrastructure.Auth;
 using Bank.Models;
 using Bank.Models.Enums;
 using BankEntity = Bank.Models.Bank;
@@ -11,10 +12,12 @@ namespace Bank.Infrastructure.Database
     public class DatabaseInitializer
     {
         private readonly BankContext _bankContext;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public DatabaseInitializer(BankContext bankContext)
+        public DatabaseInitializer(BankContext bankContext, IPasswordHasher passwordHasher)
         {
             _bankContext = bankContext;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task SeedData()
@@ -28,8 +31,13 @@ namespace Bank.Infrastructure.Database
             {
                 await _bankContext.AddAsync(AddCustomer());
             }
+            
+            if (!_bankContext.Employees.Any())
+            {
+                await _bankContext.AddAsync(AddEmployee());
+            }
 
-            if (!_bankContext.Customers.Any())
+            if (!_bankContext.Accounts.Any())
             {
                 await _bankContext.AddRangeAsync(AddAccounts());
             }
@@ -61,7 +69,7 @@ namespace Bank.Infrastructure.Database
             };
         }
 
-        private static Customer AddCustomer()
+        private Customer AddCustomer()
         {
             return new Customer
             {
@@ -78,6 +86,23 @@ namespace Bank.Infrastructure.Database
                 },
                 Email = "anowak@gmail.com",
                 PhoneNumber = "515-098-789",
+                Password = _passwordHasher.Hash("customer111"),
+                RoleInSystem = RoleType.Customer
+            };
+        }
+        
+        private Employee AddEmployee()
+        {
+            return new Employee
+            {
+                Id = Guid.Parse("DB5118DD-E555-44E8-B3CE-E0AB20C8E809"),
+                FirstName = "Jan",
+                LastName = "Kowalski",
+                Email = "jkowalski@gmail.com",
+                PhoneNumber = "545-098-789",
+                Password = _passwordHasher.Hash("admin111"),
+                RoleInSystem = RoleType.Admin,
+                Position = "Administrator"
             };
         }
 

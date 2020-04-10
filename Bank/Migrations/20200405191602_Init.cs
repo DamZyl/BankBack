@@ -31,17 +31,39 @@ namespace Bank.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     FirstName = table.Column<string>(nullable: true),
                     LastName = table.Column<string>(nullable: true),
+                    PhoneNumber = table.Column<string>(nullable: true),
+                    Email = table.Column<string>(nullable: true),
+                    Password = table.Column<string>(nullable: true),
+                    RoleInSystem = table.Column<string>(nullable: false),
                     Street = table.Column<string>(nullable: true),
                     Number = table.Column<string>(nullable: true),
                     PostCode = table.Column<string>(nullable: true),
                     City = table.Column<string>(nullable: true),
-                    Country = table.Column<string>(nullable: true),
-                    PhoneNumber = table.Column<string>(nullable: true),
-                    Email = table.Column<string>(nullable: true)
+                    Country = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customers", x => x.Id);
+                    table.CheckConstraint("CK_Customers_RoleInSystem_Enum_Constraint", "[RoleInSystem] IN(N'Admin', N'Employee', N'Customer')");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Employees",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
+                    PhoneNumber = table.Column<string>(nullable: true),
+                    Email = table.Column<string>(nullable: true),
+                    Password = table.Column<string>(nullable: true),
+                    RoleInSystem = table.Column<string>(nullable: false),
+                    Position = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Employees", x => x.Id);
+                    table.CheckConstraint("CK_Employees_RoleInSystem_Enum_Constraint", "[RoleInSystem] IN(N'Admin', N'Employee', N'Customer')");
                 });
 
             migrationBuilder.CreateTable(
@@ -79,6 +101,7 @@ namespace Bank.Migrations
                     AccountId = table.Column<Guid>(nullable: false),
                     Date = table.Column<DateTime>(nullable: false),
                     TransactionType = table.Column<string>(nullable: false),
+                    Description = table.Column<string>(nullable: true),
                     Value = table.Column<decimal>(nullable: false)
                 },
                 constraints: table =>
@@ -111,6 +134,9 @@ namespace Bank.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Employees");
+
             migrationBuilder.DropTable(
                 name: "Transactions");
 

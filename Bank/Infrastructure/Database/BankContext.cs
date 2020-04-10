@@ -14,6 +14,7 @@ namespace Bank.Infrastructure.Database
         public DbSet<Account> Accounts { get; set; }
         public DbSet<BankEntity> Banks { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<Employee> Employees { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
 
         public BankContext(IOptions<SqlOptions> sqlOptions)
@@ -36,6 +37,7 @@ namespace Bank.Infrastructure.Database
             modelBuilder.ApplyConfiguration(new BankConfiguration());
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
             modelBuilder.ApplyConfiguration(new CustomerConfiguration());
+            modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionConfiguration());
         }
     }

@@ -10,6 +10,8 @@ namespace Bank.Services
         Task<BankDetailsDto> GetInfoAsync();
         Task CreateCustomerAsync(CreateCustomer command);
         Task DeleteCustomerAsync(Guid id);
+        Task CreateEmployeeAsync(CreateEmployee command);
+        Task DeleteEmployeeAsync(Guid id);
         Task CreateAccountAsync(CreateAccount command);
         Task DeleteAccountAsync(Guid id);
     }

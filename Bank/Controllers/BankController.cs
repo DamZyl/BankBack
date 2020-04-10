@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Bank.Models.Commands;
 using Bank.Models.Dtos;
 using Bank.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.Controllers
@@ -18,12 +19,13 @@ namespace Bank.Controllers
             _bankService = bankService;
         }
 
+        //[Authorize(Roles = "Employee, Admin, Customer")]
         [HttpGet]
         public async Task<ActionResult<BankDetailsDto>> Get()
             => new JsonResult(await _bankService.GetInfoAsync());
         
         [HttpPost("customer")]
-        public async Task<ActionResult> CreateCustomer(CreateCustomer command)
+        public async Task<ActionResult> CreateCustomer([FromBody] CreateCustomer command)
         {
             await _bankService.CreateCustomerAsync(command);
 
@@ -37,9 +39,25 @@ namespace Bank.Controllers
 
             return NoContent();
         }
+        
+        [HttpPost("employee")]
+        public async Task<ActionResult> CreateEmployee([FromBody] CreateEmployee command)
+        {
+            await _bankService.CreateEmployeeAsync(command);
+
+            return CreatedAtAction(null, null, null);
+        }
+
+        [HttpDelete("employee/{id}")]
+        public async Task<ActionResult> DeleteEmployee(Guid id)
+        {
+            await _bankService.DeleteEmployeeAsync(id);
+
+            return NoContent();
+        }
 
         [HttpPost("{customerId}/account")]
-        public async Task<ActionResult> CreateAccount(CreateAccount command)
+        public async Task<ActionResult> CreateAccount([FromBody] CreateAccount command)
         {
             await _bankService.CreateAccountAsync(command);
 
