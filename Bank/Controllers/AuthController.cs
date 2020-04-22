@@ -18,7 +18,7 @@ namespace Bank.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<TokenDto>> Login([FromBody] Login command)
+        public async Task<ActionResult<string>> Login([FromBody] Login command)
             => new JsonResult(await _authService.LoginAsync(command));
 
         [HttpPost("register")]

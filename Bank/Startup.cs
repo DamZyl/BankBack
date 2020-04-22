@@ -95,23 +95,12 @@ namespace Bank
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseSwagger();
-            app.UseSwaggerUI(x =>
-            {
-                x.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            });
-
-            app.UseCors(x => 
-                    x.WithOrigins("http://localhost:4200")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                );
             
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             
             app.UseRouting();
+            app.UseCors(x => x.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader());
             
             initializer.SeedData().Wait();
             
@@ -123,6 +112,12 @@ namespace Bank
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+            
+            app.UseSwagger();
+            app.UseSwaggerUI(x =>
+            {
+                x.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
         }
     }
