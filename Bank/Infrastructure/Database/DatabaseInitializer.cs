@@ -5,49 +5,59 @@ using System.Threading.Tasks;
 using Bank.Infrastructure.Auth;
 using Bank.Models;
 using Bank.Models.Enums;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using BankEntity = Bank.Models.Bank;
 
 namespace Bank.Infrastructure.Database
 {
-    public class DatabaseInitializer
+    public static class DatabaseInitializer
     {
-        private readonly BankContext _bankContext;
-        private readonly IPasswordHasher _passwordHasher;
-
-        public DatabaseInitializer(BankContext bankContext, IPasswordHasher passwordHasher)
+        public static async Task PrepPopulation(IApplicationBuilder app)
         {
-            _bankContext = bankContext;
-            _passwordHasher = passwordHasher;
+            using var serviceScope = app.ApplicationServices.CreateScope();
+            await SeedData(serviceScope.ServiceProvider.GetService<BankContext>(), serviceScope.ServiceProvider.GetService<IPasswordHasher>());
         }
 
-        public async Task SeedData()
+        private static async Task SeedData(BankContext bankContext, IPasswordHasher passwordHasher)
         {
-            if (!_bankContext.Banks.Any())
+            Console.WriteLine("Appling Migrations...");
+            
+            bankContext.Database.Migrate();
+
+            if (!bankContext.Banks.Any())
             {
-                await _bankContext.AddAsync(AddBank());
+                Console.WriteLine("Adding data to bank - seeding...");
+                await bankContext.AddAsync(AddBank());
             }
 
-            if (!_bankContext.Customers.Any())
+            if (!bankContext.Customers.Any())
             {
-                await _bankContext.AddAsync(AddCustomer());
+                Console.WriteLine("Adding data to customers - seeding...");
+                await bankContext.AddAsync(AddCustomer(passwordHasher));
             }
             
-            if (!_bankContext.Employees.Any())
+            if (!bankContext.Employees.Any())
             {
-                await _bankContext.AddAsync(AddEmployee());
+                Console.WriteLine("Adding data to employees - seeding...");
+                await bankContext.AddAsync(AddEmployee(passwordHasher));
             }
 
-            if (!_bankContext.Accounts.Any())
+            if (!bankContext.Accounts.Any())
             {
-                await _bankContext.AddRangeAsync(AddAccounts());
+                Console.WriteLine("Adding data to accounts - seeding...");
+                await bankContext.AddRangeAsync(AddAccounts());
             }
 
-            if (!_bankContext.Transactions.Any())
+            if (!bankContext.Transactions.Any())
             {
-                await _bankContext.AddRangeAsync(AddTransactions());
+                Console.WriteLine("Adding data to transactions - seeding...");
+                await bankContext.AddRangeAsync(AddTransactions());
             }
 
-            await _bankContext.SaveChangesAsync();
+            await bankContext.SaveChangesAsync();
+            Console.WriteLine("Already have data - not seeding");
         }
 
         #region MockDb
@@ -69,7 +79,7 @@ namespace Bank.Infrastructure.Database
             };
         }
 
-        private Customer AddCustomer()
+        private static Customer AddCustomer(IPasswordHasher passwordHasher)
         {
             return new Customer
             {
@@ -86,12 +96,12 @@ namespace Bank.Infrastructure.Database
                 },
                 Email = "anowak@gmail.com",
                 PhoneNumber = "515-098-789",
-                Password = _passwordHasher.Hash("customer111"),
+                Password = passwordHasher.Hash("customer111"),
                 RoleInSystem = RoleType.Customer
             };
         }
         
-        private Employee AddEmployee()
+        private static Employee AddEmployee(IPasswordHasher passwordHasher)
         {
             return new Employee
             {
@@ -100,7 +110,7 @@ namespace Bank.Infrastructure.Database
                 LastName = "Kowalski",
                 Email = "jkowalski@gmail.com",
                 PhoneNumber = "545-098-789",
-                Password = _passwordHasher.Hash("admin111"),
+                Password = passwordHasher.Hash("admin111"),
                 RoleInSystem = RoleType.Admin,
                 Position = "Administrator"
             };

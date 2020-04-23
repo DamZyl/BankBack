@@ -29,15 +29,14 @@ namespace Bank
         {
             #region Database
 
-            services.Configure<SqlOptions>(Configuration.GetSection("SqlLinux"));
+            services.Configure<SqlOptions>(Configuration.GetSection("SqlDocker"));
             services.AddDbContext<BankContext>();
-            services.AddTransient<DatabaseInitializer>();
 
             #endregion
 
             #region Jwt
 
-             var jwtSection = Configuration.GetSection("Jwt");
+             var jwtSection = Configuration.GetSection("JwtDocker");
              services.Configure<JwtOptions>(jwtSection);
              var jwtOptions = new JwtOptions();
              jwtSection.Bind(jwtOptions);
@@ -89,20 +88,19 @@ namespace Bank
             });
         }
         
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer initializer)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
             
             app.UseRouting();
             app.UseCors(x => x.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader());
-            
-            initializer.SeedData().Wait();
+           
+            DatabaseInitializer.PrepPopulation(app).Wait();
             
             app.UseAuthentication();
             app.UseAuthorization();
