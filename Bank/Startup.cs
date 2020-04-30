@@ -29,14 +29,14 @@ namespace Bank
         {
             #region Database
 
-            services.Configure<SqlOptions>(Configuration.GetSection("SqlDocker"));
+            services.Configure<SqlOptions>(Configuration.GetSection("SqlLinux"));
             services.AddDbContext<BankContext>();
 
             #endregion
 
             #region Jwt
 
-             var jwtSection = Configuration.GetSection("JwtDocker");
+             var jwtSection = Configuration.GetSection("Jwt");
              services.Configure<JwtOptions>(jwtSection);
              var jwtOptions = new JwtOptions();
              jwtSection.Bind(jwtOptions);
@@ -98,7 +98,10 @@ namespace Bank
             app.UseStaticFiles();
             
             app.UseRouting();
-            app.UseCors(x => x.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader());
+            
+            app.UseCors(x => x.WithOrigins("http://localhost:4200")
+                .AllowAnyMethod()
+                .AllowAnyHeader());
            
             DatabaseInitializer.PrepPopulation(app).Wait();
             
