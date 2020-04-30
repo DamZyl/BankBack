@@ -1,4 +1,5 @@
 using System.Linq;
+using Bank.Extensions;
 using Bank.Models;
 using Bank.Models.Dtos;
 using BankEntity = Bank.Models.Bank;
@@ -56,7 +57,7 @@ namespace Bank.Infrastructure.Mappers
                 Id = account.Id,
                 CustomerId = account.CustomerId,
                 AccountNumber = account.AccountNumber,
-                Balance = account.Balance,
+                Balance = account.SumBalance(),
                 TransactionCount = account.Transactions.Count,
                 Transactions = account.Transactions.Select(MapTransactionToTransactionDto)
             };
@@ -69,7 +70,7 @@ namespace Bank.Infrastructure.Mappers
                 Id = account.Id,
                 CustomerId = account.CustomerId,
                 AccountNumber = account.AccountNumber,
-                Balance = account.Balance,
+                Balance = account.SumBalance(),
             };
         }
 
@@ -81,6 +82,7 @@ namespace Bank.Infrastructure.Mappers
                 AccountId = transaction.AccountId,
                 Date = transaction.Date,
                 TransactionType = transaction.TransactionType.ToString(),
+                Description = transaction.Description,
                 Value = transaction.Value
             };
         }

@@ -24,7 +24,7 @@ namespace Bank.Infrastructure.Database
         {
             Console.WriteLine("Appling Migrations...");
             
-            bankContext.Database.Migrate();
+            await bankContext.Database.MigrateAsync();
 
             if (!bankContext.Banks.Any())
             {
@@ -41,7 +41,7 @@ namespace Bank.Infrastructure.Database
             if (!bankContext.Employees.Any())
             {
                 Console.WriteLine("Adding data to employees - seeding...");
-                await bankContext.AddAsync(AddEmployee(passwordHasher));
+                await bankContext.AddRangeAsync(AddEmployees(passwordHasher));
             }
 
             if (!bankContext.Accounts.Any())
@@ -101,18 +101,32 @@ namespace Bank.Infrastructure.Database
             };
         }
         
-        private static Employee AddEmployee(IPasswordHasher passwordHasher)
+        private static IEnumerable<Employee> AddEmployees(IPasswordHasher passwordHasher)
         {
-            return new Employee
+            return new List<Employee>
             {
-                Id = Guid.Parse("DB5118DD-E555-44E8-B3CE-E0AB20C8E809"),
-                FirstName = "Jan",
-                LastName = "Kowalski",
-                Email = "jkowalski@gmail.com",
-                PhoneNumber = "545-098-789",
-                Password = passwordHasher.Hash("admin111"),
-                RoleInSystem = RoleType.Admin,
-                Position = "Administrator"
+                new Employee
+                {
+                    Id = Guid.Parse("DB5118DD-E555-44E8-B3CE-E0AB20C8E809"),
+                    FirstName = "Jan",
+                    LastName = "Kowalski",
+                    Email = "jkowalski@gmail.com",
+                    PhoneNumber = "545-098-789",
+                    Password = passwordHasher.Hash("admin111"),
+                    RoleInSystem = RoleType.Admin,
+                    Position = "Administrator"
+                },
+                new Employee
+                {
+                    Id = Guid.Parse("22B20AF3-817D-4F86-A77E-08D7EAEEA477"),
+                    FirstName = "Marcin",
+                    LastName = "Nowak",
+                    Email = "mnowak@gmail.com",
+                    PhoneNumber = "789-951-741",
+                    Password = passwordHasher.Hash("employee111"),
+                    RoleInSystem = RoleType.Employee,
+                    Position = "Manager"
+                }
             };
         }
 
@@ -178,6 +192,15 @@ namespace Bank.Infrastructure.Database
                     TransactionType = TransactionType.Outcome,
                     Description = "Zwrot kosztów",
                     Value = 300M
+                },
+                new Transaction
+                {
+                    Id = Guid.Parse("864EC7AF-5696-4F08-AB7A-57C3D65D3B8F"),
+                    AccountId = Guid.Parse("C2827041-8054-4621-be89-FD7F7FA9F142"),
+                    Date = DateTime.Now,
+                    TransactionType = TransactionType.Income,
+                    Description = "Wynagrodzenie",
+                    Value = 800M
                 }
             };
         }
