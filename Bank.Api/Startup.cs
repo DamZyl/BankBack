@@ -35,65 +35,13 @@ namespace Bank.Api
         
         public void ConfigureServices(IServiceCollection services)
         {
-           #region Database
-
-            services.Configure<SqlOptions>(Configuration.GetSection("SqlLinux"));
+            services.AddSqlConfiguration(Configuration, "SqlLinux");
             services.AddDbContext<BankContext>();
-
-            #endregion
-
-            #region Jwt
-
-             var jwtSection = Configuration.GetSection("Jwt");
-             services.Configure<JwtOptions>(jwtSection);
-             var jwtOptions = new JwtOptions();
-             jwtSection.Bind(jwtOptions);
-                        
-             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                 .AddJwtBearer(cfg =>
-                 {
-                     cfg.TokenValidationParameters = new TokenValidationParameters
-                     {
-                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
-                         ValidIssuer = jwtOptions.Issuer,
-                         ValidateAudience = false,
-                         ValidateLifetime = jwtOptions.ValidateLifetime
-                     };
-                 });
-             
-             #endregion
-
-            #region Repositories
-
-            services.AddScoped<IBankRepository, BankRepository>();
-            services.AddScoped<ICustomerRepository, CustomerRepository>();
-            services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-
-            #endregion
-
-            #region Services
-
-            services.AddScoped<IBankService, BankService>();
-            services.AddScoped<ICustomerService, CustomerService>();
-            services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<IEmployeeService, EmployeeService>();
-            services.AddScoped<IJwtHandler, JwtHandler>();
-            services.AddScoped<IPasswordHasher, PasswordHasher>();
-            services.AddScoped<IAuthService, AuthService>();
-
-            #endregion
-            
+            services.AddJwtConfiguration(Configuration, "Jwt");
+            services.AddRepositories();
+            services.AddServices();
             services.AddControllers();
-
-            services.AddSwaggerGen(x =>
-            {
-                x.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "My API",
-                    Version = "v1"
-                });
-            });
+            services.AddSwagger();
         }
         
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
