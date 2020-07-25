@@ -9,42 +9,40 @@ using Bank.Application.Models.ViewModels;
 using Bank.Domain.Models;
 using Bank.Domain.Models.Enums;
 using Bank.Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Application.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly IAccountRepository _accountRepository;
-        private readonly ICustomerRepository _customerRepository;
-        private readonly IBankRepository _bankRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AccountService(IAccountRepository accountRepository , ICustomerRepository customerRepository,
-            IBankRepository bankRepository)
+        public AccountService(IUnitOfWork unitOfWork)
         {
-            _accountRepository = accountRepository;
-            _customerRepository = customerRepository;
-            _bankRepository = bankRepository;
+            _unitOfWork = unitOfWork;
         }
         
         // Delete MAP customer to show all accounts and transactions
         public async Task<IEnumerable<AccountDetailsViewModel>> GetCustomerAccountsAsync(Guid customerId)
         {
-            var customer = await _customerRepository.GetOrFailAsync(customerId);
-            var accounts = await _accountRepository.GetCustomerAccountsAsync(customer.Id);
+            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(customerId);
+            var accounts = await _unitOfWork.Repository<Account>()
+                .FindAllWithIncludesAsync(x => x.CustomerId == customerId,
+                    includes: i => i.Include(x => x.Transactions));
 
             return accounts.Select(Mapper.MapAccountToAccountDetailsViewModel).ToList();
         }
 
         public async Task<AccountDetailsViewModel> GetAccountAsync(Guid id)
         {
-            var account = await _accountRepository.GetOrFailAsync(id);
+            var account = await _unitOfWork.Repository<Account>().GetOrFailAccountAsync(id);
 
             return Mapper.MapAccountToAccountDetailsViewModel(account);
         }
         
         public async Task CreateTransactionAsync(CreateTransaction command)
         {
-            var account = await _accountRepository.GetOrFailAsync(command.AccountId);
+            var account = await _unitOfWork.Repository<Account>().GetOrFailAccountAsync(command.AccountId);
 
             var transaction = new Transaction
             {
@@ -59,7 +57,8 @@ namespace Bank.Application.Services
             account.Transactions.Add(transaction);
             account.Balance = account.SumBalance();
 
-            await _accountRepository.UpdateAccountAsync(account);
+            await _unitOfWork.Repository<Account>().EditAsync(account);
+            await _unitOfWork.Commit();
         }
     }
 }

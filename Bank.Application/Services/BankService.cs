@@ -8,39 +8,32 @@ using Bank.Domain.Models;
 using Bank.Domain.Models.Enums;
 using Bank.Domain.Repositories;
 using Bank.Infrastructure.Auth;
+using BankEntity = Bank.Domain.Models.Bank;
 
 
 namespace Bank.Application.Services
 {
     public class BankService : IBankService
     {
-        private readonly IBankRepository _bankRepository;
-        private readonly ICustomerRepository _customerRepository;
-        private readonly IEmployeeRepository _employeeRepository;
-        private readonly IAccountRepository _accountRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasher _passwordHasher;
 
-        public BankService(IBankRepository bankRepository, ICustomerRepository customerRepository,
-            IAccountRepository accountRepository, IPasswordHasher passwordHasher, 
-            IEmployeeRepository employeeRepository)
+        public BankService(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
         {
-            _bankRepository = bankRepository;
-            _customerRepository = customerRepository;
-            _accountRepository = accountRepository;
+            _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
-            _employeeRepository = employeeRepository;
         }
 
         public async Task<BankDetailsViewModel> GetInfoAsync()
         {
-            var bank = await _bankRepository.GetOrFailAsync();
+            var bank = await _unitOfWork.Repository<BankEntity>().GetOrFailBankAsync();
             
             return Mapper.MapBankToBankDetailsViewModel(bank);
         }
 
         public async Task CreateCustomerAsync(CreateCustomer command)
         {
-            var customer = await _customerRepository.GetOrFailAsync(command.Email);
+            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(command.Email);
 
             customer = new Customer
             {
@@ -61,19 +54,21 @@ namespace Bank.Application.Services
                 RoleInSystem = RoleType.Customer
             };
 
-            await _customerRepository.AddCustomerAsync(customer);
+            await _unitOfWork.Repository<Customer>().AddAsync(customer);
+            await _unitOfWork.Commit();
         }
 
         public async Task DeleteCustomerAsync(Guid id)
         {
-            var customer = await _customerRepository.GetOrFailAsync(id);
+            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(id);
 
-            await _customerRepository.DeleteCustomerAsync(customer);
+            await _unitOfWork.Repository<Customer>().DeleteAsync(customer);
+            await _unitOfWork.Commit();
         }
 
         public async Task CreateEmployeeAsync(CreateEmployee command)
         {
-            var employee = await _employeeRepository.GetOrFailAsync(command.Email);
+            var employee = await _unitOfWork.Repository<Employee>().GetOrFailEmployeeAsync(command.Email);
             
             employee = new Employee
             {
@@ -87,19 +82,21 @@ namespace Bank.Application.Services
                 Position = command.Position
             };
 
-            await _employeeRepository.AddEmployeeAsync(employee);
+            await _unitOfWork.Repository<Employee>().AddAsync(employee);
+            await _unitOfWork.Commit();
         }
 
         public async Task DeleteEmployeeAsync(Guid id)
         {
-            var employee = await _employeeRepository.GetOrFailAsync(id);
+            var employee = await _unitOfWork.Repository<Employee>().GetOrFailEmployeeAsync(id);
 
-            await _employeeRepository.DeleteEmployeeAsync(employee);
+            await _unitOfWork.Repository<Employee>().DeleteAsync(employee);
+            await _unitOfWork.Commit();
         }
 
         public async Task CreateAccountAsync(CreateAccount command)
         {
-            var customer = await _customerRepository.GetOrFailAsync(command.CustomerId);
+            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(command.CustomerId);
             
             var account = new Account
             {
@@ -112,13 +109,15 @@ namespace Bank.Application.Services
             
             customer.Accounts.Add(account);
 
-            await _customerRepository.UpdateCustomerAsync(customer);
+            await _unitOfWork.Repository<Customer>().EditAsync(customer);
+            await _unitOfWork.Commit();
         }
 
         public async Task DeleteAccountAsync(Guid id)
         {
-            var account = await _accountRepository.GetOrFailAsync(id);
-            await _accountRepository.DeleteAccountAsync(account);
+            var account = await _unitOfWork.Repository<Account>().GetOrFailAccountAsync(id);
+            await _unitOfWork.Repository<Account>().DeleteAsync(account);
+            await _unitOfWork.Commit();
         }
     }
 }

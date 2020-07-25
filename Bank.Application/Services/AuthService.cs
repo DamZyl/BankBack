@@ -6,28 +6,27 @@ using Bank.Domain.Models.Enums;
 using Bank.Domain.Repositories;
 using Bank.Infrastructure.Auth;
 using Bank.Infrastructure.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Application.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly ICustomerRepository _customerRepository;
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IJwtHandler _jwtHandler;
         private readonly IPasswordHasher _passwordHasher;
 
-        public AuthService(ICustomerRepository customerRepository, IJwtHandler jwtHandler,
-            IEmployeeRepository employeeRepository, IPasswordHasher passwordHasher)
+        public AuthService(IUnitOfWork unitOfWork, IJwtHandler jwtHandler,
+            IPasswordHasher passwordHasher)
         {
-            _customerRepository = customerRepository;
-            _employeeRepository = employeeRepository;
+            _unitOfWork = unitOfWork;
             _jwtHandler = jwtHandler;
             _passwordHasher = passwordHasher;
         }
         
         public async Task RegisterAsync(CreateCustomer command)
         {
-            var customer = await _customerRepository.GetOrFailAsync(command.Email);
+            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(command.Email);
 
             customer = new Customer
             {
@@ -48,19 +47,22 @@ namespace Bank.Application.Services
                 RoleInSystem = RoleType.Customer
             };
 
-            await _customerRepository.AddCustomerAsync(customer);
+            await _unitOfWork.Repository<Customer>().AddAsync(customer);
+            await _unitOfWork.Commit();
         }
 
         public async Task<string> LoginAsync(Login command)
         {
-            var customer = await _customerRepository.GetCustomerByMailAsync(command.Email);
+            var customer = await _unitOfWork.Repository<Customer>()
+                .FindByWithIncludesAsync(x => x.Email == command.Email, 
+                includes: i => i.Include(x => x.Accounts));
 
             if (IsUserValid(customer, command.Password))
             {
                 return CreateToken(customer, _jwtHandler);
             }
 
-            var employee = await _employeeRepository.GetEmployeeByMailAsync(command.Email);
+            var employee = await _unitOfWork.Repository<Employee>().FindByAsync(x => x.Email == command.Email);
 
             if (IsUserValid(employee, command.Password))
             {

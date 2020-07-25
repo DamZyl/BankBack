@@ -9,22 +9,24 @@ using Bank.Application.Models.ViewModels;
 using Bank.Domain.Models;
 using Bank.Domain.Repositories;
 using Bank.Infrastructure.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Bank.Application.Services
 {
     public class CustomerService : ICustomerService
     {
-        private readonly ICustomerRepository _customerRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CustomerService(ICustomerRepository customerRepository)
+        public CustomerService(IUnitOfWork unitOfWork)
         {
-            _customerRepository = customerRepository;
+            _unitOfWork = unitOfWork;
         }
         
         public async Task<IEnumerable<CustomerDetailsViewModel>> GetCustomersAsync()
         {
-            var customers = await _customerRepository.GetCustomersAsync();
+            var customers = await _unitOfWork.Repository<Customer>()
+                .GetAllWithIncludesAsync(includes: i => i.Include(x => x.Accounts));
 
             if (customers == null)
             {
@@ -36,14 +38,16 @@ namespace Bank.Application.Services
 
         public async Task<CustomerDetailsViewModel> GetCustomerByIdAsync(Guid id)
         {
-            var customer = await _customerRepository.GetOrFailAsync(id);
+            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(id);
 
             return Mapper.MapCustomerToCustomerDetailsViewModel(customer);
         }
 
         public async Task<CustomerDetailsViewModel> GetCustomerByMailAsync(string email)
         {
-            var customer = await _customerRepository.GetCustomerByMailAsync(email);
+            var customer = await _unitOfWork.Repository<Customer>()
+                .FindByWithIncludesAsync(x => x.Email == email, 
+                    includes: i => i.Include(x => x.Accounts));
 
             if (customer == null)
             {
@@ -55,7 +59,7 @@ namespace Bank.Application.Services
 
         public async Task UpdateCustomerAsync(Guid id, UpdateCustomer command)
         {
-            var customer = await _customerRepository.GetOrFailAsync(id);
+            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(id);
             
             customer.Address = new Address
             {
@@ -69,7 +73,7 @@ namespace Bank.Application.Services
             customer.PhoneNumber = command.PhoneNumber;
             customer.Email = command.Email;
 
-            await _customerRepository.UpdateCustomerAsync(customer);
+            await _unitOfWork.Repository<Customer>().EditAsync(customer);
         }
     }
 }

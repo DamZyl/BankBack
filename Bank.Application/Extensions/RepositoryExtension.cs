@@ -3,15 +3,17 @@ using System.Threading.Tasks;
 using Bank.Domain.Repositories;
 using Bank.Infrastructure.Exceptions;
 using Bank.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using BankEntity = Bank.Domain.Models.Bank;
 
 namespace Bank.Application.Extensions
 {
+    // refactor to generic
     public static class RepositoryExtension
     {
-        public static async Task<Account> GetOrFailAsync(this IAccountRepository repository, Guid id)
+        public static async Task<Account> GetOrFailAccountAsync(this IGenericRepository<Account> repository, Guid id)
         {
-            var account = await repository.GetAccountAsync(id);
+            var account = await repository.FindByIdAsync(id);
 
             if (account == null)
             {
@@ -21,9 +23,9 @@ namespace Bank.Application.Extensions
             return account;
         }
         
-        public static async Task<Customer> GetOrFailAsync(this ICustomerRepository repository, Guid id)
+        public static async Task<Customer> GetOrFailCustomerAsync(this IGenericRepository<Customer> repository, Guid id)
         {
-            var customer = await repository.GetCustomerByIdAsync(id);
+            var customer = await repository.FindByIdAsync(id);
 
             if (customer == null)
             {
@@ -33,9 +35,9 @@ namespace Bank.Application.Extensions
             return customer;
         }
         
-        public static async Task<Customer> GetOrFailAsync(this ICustomerRepository repository, string email)
+        public static async Task<Customer> GetOrFailCustomerAsync(this IGenericRepository<Customer> repository, string email)
         {
-            var customer = await repository.GetCustomerByMailAsync(email);
+            var customer = await repository.FindByAsync(x => x.Email == email);
 
             if (customer != null)
             {
@@ -45,9 +47,9 @@ namespace Bank.Application.Extensions
             return null;
         }
         
-        public static async Task<Employee> GetOrFailAsync(this IEmployeeRepository repository, Guid id)
+        public static async Task<Employee> GetOrFailEmployeeAsync(this IGenericRepository<Employee> repository, Guid id)
         {
-            var employee = await repository.GetEmployeeByIdAsync(id);
+            var employee = await repository.FindByIdAsync(id);
 
             if (employee == null)
             {
@@ -57,9 +59,9 @@ namespace Bank.Application.Extensions
             return employee;
         }
         
-        public static async Task<Employee> GetOrFailAsync(this IEmployeeRepository repository, string email)
+        public static async Task<Employee> GetOrFailEmployeeAsync(this IGenericRepository<Employee> repository, string email)
         {
-            var employee = await repository.GetEmployeeByMailAsync(email);
+            var employee = await repository.FindByAsync(x => x.Email == email);
 
             if (employee != null)
             {
@@ -69,9 +71,10 @@ namespace Bank.Application.Extensions
             return null;
         }
         
-        public static async Task<BankEntity> GetOrFailAsync(this IBankRepository repository)
+        public static async Task<BankEntity> GetOrFailBankAsync(this IGenericRepository<BankEntity> repository)
         {
-            var bank = await repository.GetInfoAsync();
+            var bank = await repository.FindByWithIncludesAsync(null,
+                includes: i => i.Include(x => x.Accounts));
 
             if (bank == null)
             {
