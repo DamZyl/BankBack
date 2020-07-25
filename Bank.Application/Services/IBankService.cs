@@ -5,7 +5,7 @@ using Bank.Application.Models.ViewModels;
 
 namespace Bank.Application.Services
 {
-    public interface IBankService
+    public interface IBankService : IService
     {
         Task<BankDetailsViewModel> GetInfoAsync();
         Task CreateCustomerAsync(CreateCustomer command);

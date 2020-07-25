@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using Bank.Application.Services;
 using Bank.Domain.Repositories;
@@ -9,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 namespace Bank.Api.Extensions
 {
@@ -38,24 +41,22 @@ namespace Bank.Api.Extensions
         }
         
         public static void AddRepositories(this IServiceCollection services)
-        {
-            services.AddScoped<IBankRepository, BankRepository>();
-            services.AddScoped<ICustomerRepository, CustomerRepository>();
-            services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-        }
+            => services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         
+        public static void AddUnitOfWork(this IServiceCollection services)
+            => services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         public static void AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IBankService, BankService>();
-            services.AddScoped<ICustomerService, CustomerService>();
-            services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<IEmployeeService, EmployeeService>();
-            services.AddScoped<IJwtHandler, JwtHandler>();
-            services.AddScoped<IPasswordHasher, PasswordHasher>();
-            services.AddScoped<IAuthService, AuthService>();
+             services.AddScoped<IBankService, BankService>();
+             services.AddScoped<ICustomerService, CustomerService>();
+             services.AddScoped<IAccountService, AccountService>();
+             services.AddScoped<IEmployeeService, EmployeeService>();
+             services.AddScoped<IJwtHandler, JwtHandler>();
+             services.AddScoped<IPasswordHasher, PasswordHasher>();
+             services.AddScoped<IAuthService, AuthService>();
         }
-        
+      
         public static void AddSwagger(this IServiceCollection services)
         {
             services.AddSwaggerGen(x =>
@@ -65,6 +66,14 @@ namespace Bank.Api.Extensions
                     Title = "My API",
                     Version = "v1"
                 });
+            });
+        }
+        
+        public static void AddLogger(this IServiceCollection services)
+        {
+            services.AddLogging(builder => 
+            {
+                builder.AddSerilog(dispose: true);
             });
         }
     }

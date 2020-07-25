@@ -6,7 +6,7 @@ using Bank.Application.Models.ViewModels;
 
 namespace Bank.Application.Services
 {
-    public interface IEmployeeService
+    public interface IEmployeeService : IService
     {
         Task<IEnumerable<EmployeeViewModel>> GetEmployeesAsync();
         Task<EmployeeViewModel> GetEmployeeByIdAsync(Guid id);

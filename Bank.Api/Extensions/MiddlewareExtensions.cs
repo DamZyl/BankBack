@@ -7,5 +7,8 @@ namespace Bank.Api.Extensions
     {
         public static void UseErrorHandler(this IApplicationBuilder builder)
             => builder.UseMiddleware(typeof(ErrorHandlerMiddleware));
+        
+        public static void UseLogger(this IApplicationBuilder builder)
+            => builder.UseMiddleware(typeof(LoggerMiddleware));
     }
 }

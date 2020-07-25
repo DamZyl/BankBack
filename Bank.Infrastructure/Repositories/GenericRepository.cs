@@ -70,6 +70,11 @@ namespace Bank.Infrastructure.Repositories
                 queryable = includes(queryable);
             }
 
+            if (predicate == null)
+            {
+                return await queryable.FirstAsync();
+            }
+
             return await queryable.SingleOrDefaultAsync(predicate);
         }
 
