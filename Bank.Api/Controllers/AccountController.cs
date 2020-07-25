@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Bank.Application.Models.ViewModels;
-using Bank.Application.Services;
+using Bank.Application.Accounts.Services;
+using Bank.Application.Accounts.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.Api.Controllers

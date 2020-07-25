@@ -1,6 +1,9 @@
 using System.Linq;
+using Bank.Application.Accounts.ViewModels;
+using Bank.Application.Banks.ViewModels;
+using Bank.Application.Customers.ViewModels;
+using Bank.Application.Employees.ViewModels;
 using Bank.Application.Extensions;
-using Bank.Application.Models.ViewModels;
 using Bank.Domain.Models;
 using BankEntity = Bank.Domain.Models.Bank;
 

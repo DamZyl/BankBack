@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using Bank.Application.Models.Commands;
-using Bank.Application.Services;
+using Bank.Application.Auths.Commands;
+using Bank.Application.Auths.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.Api.Controllers

@@ -27,8 +27,8 @@ namespace Bank.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSqlConfiguration(Configuration, "SqlLinux");
-            services.AddDbContext<BankContext>();
             services.AddJwtConfiguration(Configuration, "Jwt");
+            services.AddDbContext<BankContext>();
             
             services.AddRepositories();
             services.AddUnitOfWork();

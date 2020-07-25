@@ -1,5 +1,7 @@
 namespace Bank.Infrastructure.Mappers
 {
-    // Marker
-    public interface IMapper {}
+    public interface IMapper<in TEntity, out TViewModel>
+    {
+        TViewModel MapObject(TEntity entity);
+    }
 }
