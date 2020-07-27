@@ -25,7 +25,7 @@ namespace Bank.Application.Accounts.Services
         // Delete MAP customer to show all accounts and transactions
         public async Task<IEnumerable<AccountDetailsViewModel>> GetCustomerAccountsAsync(Guid customerId)
         {
-            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(customerId);
+            var customer = await _unitOfWork.Repository<Customer>().GetOrFailAsync(customerId);
             var accounts = await _unitOfWork.Repository<Account>()
                 .FindAllWithIncludesAsync(x => x.CustomerId == customerId,
                     includes: i => i.Include(x => x.Transactions));
@@ -35,14 +35,14 @@ namespace Bank.Application.Accounts.Services
 
         public async Task<AccountDetailsViewModel> GetAccountAsync(Guid id)
         {
-            var account = await _unitOfWork.Repository<Account>().GetOrFailAccountAsync(id);
+            var account = await _unitOfWork.Repository<Account>().GetOrFailAsync(id);
 
             return Mapper.MapAccountToAccountDetailsViewModel(account);
         }
         
         public async Task CreateTransactionAsync(CreateTransaction command)
         {
-            var account = await _unitOfWork.Repository<Account>().GetOrFailAccountAsync(command.AccountId);
+            var account = await _unitOfWork.Repository<Account>().GetOrFailAsync(command.AccountId);
 
             var transaction = new Transaction
             {

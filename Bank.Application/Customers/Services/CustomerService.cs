@@ -38,7 +38,7 @@ namespace Bank.Application.Customers.Services
 
         public async Task<CustomerDetailsViewModel> GetCustomerByIdAsync(Guid id)
         {
-            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(id);
+            var customer = await _unitOfWork.Repository<Customer>().GetOrFailAsync(id);
 
             return Mapper.MapCustomerToCustomerDetailsViewModel(customer);
         }
@@ -46,20 +46,15 @@ namespace Bank.Application.Customers.Services
         public async Task<CustomerDetailsViewModel> GetCustomerByMailAsync(string email)
         {
             var customer = await _unitOfWork.Repository<Customer>()
-                .FindByWithIncludesAsync(x => x.Email == email, 
+                .GetOrFailWithIncludesAsync(x => x.Email == email, 
                     includes: i => i.Include(x => x.Accounts));
-
-            if (customer == null)
-            {
-                throw new BusinessException(ErrorCodes.NoExist,"Customer doesn't exist.");
-            }
 
             return Mapper.MapCustomerToCustomerDetailsViewModel(customer);
         }
 
         public async Task UpdateCustomerAsync(Guid id, UpdateCustomer command)
         {
-            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(id);
+            var customer = await _unitOfWork.Repository<Customer>().GetOrFailAsync(id);
             
             customer.Address = new Address
             {

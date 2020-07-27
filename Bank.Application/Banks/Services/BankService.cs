@@ -9,6 +9,7 @@ using Bank.Domain.Models;
 using Bank.Domain.Models.Enums;
 using Bank.Domain.Repositories;
 using Bank.Infrastructure.Auth;
+using Microsoft.EntityFrameworkCore;
 using BankEntity = Bank.Domain.Models.Bank;
 
 
@@ -27,16 +28,18 @@ namespace Bank.Application.Banks.Services
 
         public async Task<BankDetailsViewModel> GetInfoAsync()
         {
-            var bank = await _unitOfWork.Repository<BankEntity>().GetOrFailBankAsync();
+            var bank = await _unitOfWork.Repository<BankEntity>().GetOrFailWithIncludesAsync(null,
+                includes: i => i.Include(x => x.Accounts));
             
             return Mapper.MapBankToBankDetailsViewModel(bank);
         }
 
         public async Task CreateCustomerAsync(CreateCustomer command)
         {
-            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(command.Email);
+            await _unitOfWork.Repository<Customer>()
+                .GetOrFailWithCheckExistsAsync(x => x.Email == command.Email);
 
-            customer = new Customer
+            var customer = new Customer
             {
                 Id = command.Id,
                 FirstName = command.FirstName,
@@ -61,7 +64,7 @@ namespace Bank.Application.Banks.Services
 
         public async Task DeleteCustomerAsync(Guid id)
         {
-            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(id);
+            var customer = await _unitOfWork.Repository<Customer>().GetOrFailAsync(id);
 
             await _unitOfWork.Repository<Customer>().DeleteAsync(customer);
             await _unitOfWork.Commit();
@@ -69,9 +72,10 @@ namespace Bank.Application.Banks.Services
 
         public async Task CreateEmployeeAsync(CreateEmployee command)
         {
-            var employee = await _unitOfWork.Repository<Employee>().GetOrFailEmployeeAsync(command.Email);
+            await _unitOfWork.Repository<Employee>()
+                .GetOrFailWithCheckExistsAsync(x => x.Email == command.Email);
             
-            employee = new Employee
+            var employee = new Employee
             {
                 Id = command.Id,
                 FirstName = command.FirstName,
@@ -89,7 +93,7 @@ namespace Bank.Application.Banks.Services
 
         public async Task DeleteEmployeeAsync(Guid id)
         {
-            var employee = await _unitOfWork.Repository<Employee>().GetOrFailEmployeeAsync(id);
+            var employee = await _unitOfWork.Repository<Employee>().GetOrFailAsync(id);
 
             await _unitOfWork.Repository<Employee>().DeleteAsync(employee);
             await _unitOfWork.Commit();
@@ -97,7 +101,7 @@ namespace Bank.Application.Banks.Services
 
         public async Task CreateAccountAsync(CreateAccount command)
         {
-            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(command.CustomerId);
+            var customer = await _unitOfWork.Repository<Customer>().GetOrFailAsync(command.CustomerId);
             
             var account = new Account
             {
@@ -116,7 +120,8 @@ namespace Bank.Application.Banks.Services
 
         public async Task DeleteAccountAsync(Guid id)
         {
-            var account = await _unitOfWork.Repository<Account>().GetOrFailAccountAsync(id);
+            var account = await _unitOfWork.Repository<Account>().GetOrFailAsync(id);
+            
             await _unitOfWork.Repository<Account>().DeleteAsync(account);
             await _unitOfWork.Commit();
         }

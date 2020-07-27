@@ -1,87 +1,65 @@
 using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Bank.Domain.Repositories;
 using Bank.Infrastructure.Exceptions;
-using Bank.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using BankEntity = Bank.Domain.Models.Bank;
 
 namespace Bank.Application.Extensions
 {
-    // refactor to generic
     public static class RepositoryExtension
     {
-        public static async Task<Account> GetOrFailAccountAsync(this IGenericRepository<Account> repository, Guid id)
+        public static async Task<TEntity> GetOrFailAsync<TEntity>(this IGenericRepository<TEntity> repository, Guid id) where TEntity : class
         {
-            var account = await repository.FindByIdAsync(id);
+            var entity = await repository.FindByIdAsync(id);
 
-            if (account == null)
+            if (entity == null)
             {
-                throw new BusinessException(ErrorCodes.NoExist, "Account doesn't exist.");
+                throw new BusinessException(ErrorCodes.NoExist, $"{typeof(TEntity).Name} doesn't exist.");
             }
 
-            return account;
+            return entity;
         }
         
-        public static async Task<Customer> GetOrFailCustomerAsync(this IGenericRepository<Customer> repository, Guid id)
+        public static async Task<TEntity> GetOrFailAsync<TEntity>(this IGenericRepository<TEntity> repository, 
+            Expression<Func<TEntity, bool>> predicate) where TEntity : class 
         {
-            var customer = await repository.FindByIdAsync(id);
+            var entity = await repository.FindByAsync(predicate);
 
-            if (customer == null)
+            if (entity == null)
             {
-                throw new BusinessException(ErrorCodes.NoExist,"Customer doesn't exist.");
+                throw new BusinessException(ErrorCodes.NoExist, $"{typeof(TEntity).Name} does not exist");
             }
 
-            return customer;
+            return entity;
         }
         
-        public static async Task<Customer> GetOrFailCustomerAsync(this IGenericRepository<Customer> repository, string email)
+        public static async Task<TEntity> GetOrFailWithCheckExistsAsync<TEntity>(this IGenericRepository<TEntity> repository, 
+            Expression<Func<TEntity, bool>> predicate) where TEntity : class 
         {
-            var customer = await repository.FindByAsync(x => x.Email == email);
+            var entity = await repository.FindByAsync(predicate);
 
-            if (customer != null)
+            if (entity != null)
             {
-                throw new BusinessException(ErrorCodes.Exist,"Customer exists.");
+                throw new BusinessException(ErrorCodes.Exist, $"{typeof(TEntity).Name} exists");
             }
 
             return null;
         }
         
-        public static async Task<Employee> GetOrFailEmployeeAsync(this IGenericRepository<Employee> repository, Guid id)
+        public static async Task<TEntity> GetOrFailWithIncludesAsync<TEntity>(this IGenericRepository<TEntity> repository, 
+            Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> includes) where TEntity : class 
         {
-            var employee = await repository.FindByIdAsync(id);
+            var entity = await repository.FindByWithIncludesAsync(predicate, includes);
 
-            if (employee == null)
+            if (entity == null)
             {
-                throw new BusinessException(ErrorCodes.NoExist,"Employee doesn't exist.");
+                throw new BusinessException(ErrorCodes.NoExist, $"{typeof(TEntity).Name} does not exist");
             }
 
-            return employee;
-        }
-        
-        public static async Task<Employee> GetOrFailEmployeeAsync(this IGenericRepository<Employee> repository, string email)
-        {
-            var employee = await repository.FindByAsync(x => x.Email == email);
-
-            if (employee != null)
-            {
-                throw new BusinessException(ErrorCodes.Exist,"Employee exists.");
-            }
-
-            return null;
-        }
-        
-        public static async Task<BankEntity> GetOrFailBankAsync(this IGenericRepository<BankEntity> repository)
-        {
-            var bank = await repository.FindByWithIncludesAsync(null,
-                includes: i => i.Include(x => x.Accounts));
-
-            if (bank == null)
-            {
-                throw new BusinessException(ErrorCodes.NoExist,"Bank doesn't exist.");
-            }
-
-            return bank;
+            return entity;
         }
     }
 }

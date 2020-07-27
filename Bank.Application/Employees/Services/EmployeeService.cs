@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Bank.Application.Employees.Commands;
-using Bank.Application.Employees.Services;
 using Bank.Application.Employees.ViewModels;
 using Bank.Application.Extensions;
 using Bank.Application.Mappers;
@@ -11,7 +10,7 @@ using Bank.Domain.Models;
 using Bank.Domain.Repositories;
 using Bank.Infrastructure.Exceptions;
 
-namespace Bank.Application.Services
+namespace Bank.Application.Employees.Services
 {
     public class EmployeeService : IEmployeeService
     {
@@ -35,7 +34,7 @@ namespace Bank.Application.Services
 
         public async Task<EmployeeViewModel> GetEmployeeByIdAsync(Guid id)
         {
-            var employee = await _unitOfWork.Repository<Employee>().GetOrFailEmployeeAsync(id);
+            var employee = await _unitOfWork.Repository<Employee>().GetOrFailAsync(id);
 
             return Mapper.MapEmployeeToEmployeeViewModel(employee);
         }
@@ -54,7 +53,7 @@ namespace Bank.Application.Services
 
         public async Task UpdateEmployeeAsync(Guid id, UpdateEmployee command)
         {
-            var employee = await _unitOfWork.Repository<Employee>().GetOrFailEmployeeAsync(id);
+            var employee = await _unitOfWork.Repository<Employee>().GetOrFailAsync(id);
 
             employee.Email = command.Email;
             employee.PhoneNumber = command.PhoneNumber;

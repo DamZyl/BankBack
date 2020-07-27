@@ -4,7 +4,6 @@ using Bank.Application.Auths.Services;
 using Bank.Application.Banks.Services;
 using Bank.Application.Customers.Services;
 using Bank.Application.Employees.Services;
-using Bank.Application.Services;
 using Bank.Domain.Repositories;
 using Bank.Infrastructure.Auth;
 using Bank.Infrastructure.Repositories;

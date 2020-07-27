@@ -26,9 +26,10 @@ namespace Bank.Application.Auths.Services
         
         public async Task RegisterAsync(CreateCustomer command)
         {
-            var customer = await _unitOfWork.Repository<Customer>().GetOrFailCustomerAsync(command.Email);
+            await _unitOfWork.Repository<Customer>()
+                .GetOrFailWithCheckExistsAsync(x => x.Email == command.Email);
 
-            customer = new Customer
+            var customer = new Customer
             {
                 Id = command.Id,
                 FirstName = command.FirstName,
