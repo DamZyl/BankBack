@@ -79,17 +79,6 @@ namespace Bank.Application.Auths.Services
         }
 
         private static string CreateToken<T>(T user, IJwtHandler jwtHandler) where T : User
-        {
-            var jwt = jwtHandler.CreateToken(user.Id, $"{ user.FirstName } { user.LastName }",
-                user.RoleInSystem.ToString());
-
-            /*return new TokenDto
-            {
-                Token = jwt.Token,
-                Expires = jwt.Expires,
-                Role = user.RoleInSystem.ToString()
-            };*/
-            return jwt.Token;
-        }
+            => jwtHandler.CreateToken(user.Id, $"{ user.FirstName } { user.LastName }", user.RoleInSystem.ToString());
     }
 }
